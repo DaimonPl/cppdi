@@ -14,6 +14,8 @@
 
 /**
  * Single header file which includes entire public cppdi API
+ *
+ * User of cppdi should include only this file
  */
 
 #include "dispose_guard.h"
@@ -25,4 +27,4 @@
 #include "producer_repository.h"
 #include "provider.h"
 
-#endif /* CPPDI_CPPDI_H_ */
+#endif  // CPPDI_CPPDI_H_

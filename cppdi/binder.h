@@ -47,7 +47,7 @@ class Binder {
    * return same instance of T
    */
   template<typename F, typename T>
-  void Bind() throw (BindingError);
+  void Bind() throw(BindingError);
 
   /**
    * Creates F (name) -> T binding - T must derive from F
@@ -56,20 +56,20 @@ class Binder {
    * return same instance of T
    */
   template<typename F, typename T>
-  void Bind(const std::string &name) throw (BindingError);
+  void Bind(const std::string &name) throw(BindingError);
 
   /**
    * Creates T -> instance binding
    */
   template<typename T>
-  void Bind(const std::shared_ptr<T> &instance) throw (BindingError);
+  void Bind(const std::shared_ptr<T> &instance) throw(BindingError);
 
   /**
    * Creates T (name) -> instance binding
    */
   template<typename T>
   void Bind(const std::shared_ptr<T> &instance, const std::string &name)
-                throw (BindingError);
+                throw(BindingError);
 
   /**
    * Creates T -> Provider<T> binding
@@ -77,7 +77,7 @@ class Binder {
    * P must derive from Provider<T>
    */
   template<typename T, typename P>
-  void BindProvider() throw (BindingError);
+  void BindProvider() throw(BindingError);
 
   /**
    * Creates T (name) -> Provider<T> binding
@@ -85,10 +85,10 @@ class Binder {
    * P must derive from Provider<T>
    */
   template<typename T, typename P>
-  void BindProvider(const std::string &name) throw (BindingError);
+  void BindProvider(const std::string &name) throw(BindingError);
 
  private:
-  const std::unordered_map<internal::Key, std::shared_ptr<Provider<void>>>&GetProviderBindings() const;
+  const std::unordered_map<internal::Key, std::shared_ptr<Provider<void>>> &GetProviderBindings() const;
   const std::unordered_map<internal::Key, internal::Key> &GetLinkedBindings() const;
 
   void AssertBindingNotExists(const internal::Key &key);
