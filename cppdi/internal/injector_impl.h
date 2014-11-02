@@ -29,13 +29,11 @@ Injector::Injector(const Binder &binder) {
   state_ = UNINITIALIZED;
 }
 
-std::shared_ptr<void> Injector::GetInstance(const internal::Key &key)
-    throw (InjectionError) {
+std::shared_ptr<void> Injector::GetInstance(const internal::Key &key) {
   return GetProvider(key)->Get();
 }
 
-std::shared_ptr<Provider<void>> Injector::GetProvider(const internal::Key &key)
-    throw (InjectionError) {
+std::shared_ptr<Provider<void>> Injector::GetProvider(const internal::Key &key) {
   if (state_ == DISPOSED) {
     throw InjectionError("Injector has been disposed!");
   } else if (state_ == UNINITIALIZED) {
@@ -84,26 +82,24 @@ std::shared_ptr<Provider<void>> Injector::GetProvider(const internal::Key &key)
 }
 
 template<typename T>
-std::shared_ptr<T> Injector::GetInstance() throw (InjectionError) {
+std::shared_ptr<T> Injector::GetInstance() {
   return GetInstance<T>(std::string());
 }
 
 template<typename T>
-std::shared_ptr<T> Injector::GetInstance(const std::string &name)
-    throw (InjectionError) {
+std::shared_ptr<T> Injector::GetInstance(const std::string &name) {
   internal::Key key(typeid(T), name);
 
   return std::static_pointer_cast<T>(GetInstance(key));
 }
 
 template<typename T>
-std::shared_ptr<Provider<T>> Injector::GetProvider() throw (InjectionError) {
+std::shared_ptr<Provider<T>> Injector::GetProvider() {
   return GetProvider<T>(std::string());
 }
 
 template<typename T>
-std::shared_ptr<Provider<T>> Injector::GetProvider(const std::string &name)
-    throw (InjectionError) {
+std::shared_ptr<Provider<T>> Injector::GetProvider(const std::string &name) {
   internal::Key key(typeid(T), name);
 
   std::shared_ptr<Provider<T>> provider(

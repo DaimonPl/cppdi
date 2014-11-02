@@ -26,7 +26,7 @@ class InstanceProvider : public Provider<void> {
 
   virtual ~InstanceProvider() = default;
 
-  virtual std::shared_ptr<void> Get() throw (InjectionError) override {
+  virtual std::shared_ptr<void> Get() override {
     return std::static_pointer_cast<T>(instance_);
   }
  private:

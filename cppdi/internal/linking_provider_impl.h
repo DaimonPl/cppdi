@@ -21,7 +21,7 @@ namespace internal {
       : target_(target) {
   }
 
-  std::shared_ptr<void> LinkingProvider::Get() throw (InjectionError) {
+  std::shared_ptr<void> LinkingProvider::Get() {
     return injector_->GetInstance(target_);
   }
 

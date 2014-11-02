@@ -23,7 +23,7 @@
 namespace cppdi {
 
 template<typename T, typename ... Args>
-void Binder::BindConstructor() throw (BindingError) {
+void Binder::BindConstructor() {
   internal::Key key(typeid(T));
 
   AssertBindingNotExists(key);
@@ -34,12 +34,12 @@ void Binder::BindConstructor() throw (BindingError) {
 }
 
 template<typename F, typename T>
-void Binder::BindTypes() throw (BindingError) {
+void Binder::BindTypes() {
   BindTypes<F, T>(std::string());
 }
 
 template<typename F, typename T>
-void Binder::BindTypes(const std::string &name) throw (BindingError) {
+void Binder::BindTypes(const std::string &name) {
   static_assert(std::is_base_of<F, T>::value,
       "T must be a descendant of F"
   );
@@ -56,14 +56,13 @@ void Binder::BindTypes(const std::string &name) throw (BindingError) {
 }
 
 template<typename T>
-void Binder::BindInstance(const std::shared_ptr<T> &instance)
-    throw (BindingError) {
+void Binder::BindInstance(const std::shared_ptr<T> &instance) {
   Binder::BindInstance<T>(instance, std::string());
 }
 
 template<typename T>
 void Binder::BindInstance(const std::shared_ptr<T> &instance,
-                          const std::string &name) throw (BindingError) {
+                          const std::string &name) {
   internal::Key key(typeid(T), name);
   AssertBindingNotExists(key);
 
@@ -74,12 +73,12 @@ void Binder::BindInstance(const std::shared_ptr<T> &instance,
 }
 
 template<typename T, typename P>
-void Binder::BindProvider() throw (BindingError) {
+void Binder::BindProvider() {
   BindProvider<T, P>(std::string());
 }
 
 template<typename T, typename P>
-void Binder::BindProvider(const std::string &name) throw (BindingError) {
+void Binder::BindProvider(const std::string &name) {
   static_assert(std::is_base_of<Provider<T>, P>::value,
       "P must implement Provider<T>"
   );

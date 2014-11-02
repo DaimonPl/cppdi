@@ -30,7 +30,7 @@ class ProducingProvider : public Provider<void> {
 
   virtual ~ProducingProvider() = default;
 
-  virtual std::shared_ptr<void> Get() throw (InjectionError) override {
+  virtual std::shared_ptr<void> Get() override {
     if (!instance_) {
       instance_ = producer_(injector_);
 

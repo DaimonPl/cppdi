@@ -30,8 +30,7 @@ class InjectorFactory {
    *
    * \param module module to create injector from
    */
-  std::shared_ptr<Injector> Create(const Module &module) const
-      throw (BindingError);
+  std::shared_ptr<Injector> Create(const Module &module) const;
 
   /**
    * Creates injector from module initialization list
@@ -39,8 +38,7 @@ class InjectorFactory {
    * \param modules initialization list of modules
    */
   std::shared_ptr<Injector> Create(
-      const std::initializer_list<const Module*> &modules) const
-          throw (BindingError);
+      const std::initializer_list<const Module*> &modules) const;
 };
 
 }  // namespace cppdi

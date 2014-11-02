@@ -26,7 +26,7 @@ class LinkingProvider : public Provider<void> {
 
   virtual ~LinkingProvider() = default;
 
-  virtual std::shared_ptr<void> Get() throw (InjectionError) override;
+  virtual std::shared_ptr<void> Get() override;
 
  private:
   virtual void Initialize(const std::shared_ptr<cppdi::Injector> &injector)

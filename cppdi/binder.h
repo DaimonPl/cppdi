@@ -55,7 +55,7 @@ class Binder {
    * \throw BindingError if producer is already registered
    */
   template<typename T, typename ... Args>
-  void BindConstructor() throw (BindingError);
+  void BindConstructor();
 
   /**
    * Creates F -> T binding - T must derive from F.
@@ -64,7 +64,7 @@ class Binder {
    * return same instance of T
    */
   template<typename F, typename T>
-  void BindTypes() throw(BindingError);
+  void BindTypes();
 
   /**
    * Creates F (name) -> T binding - T must derive from F
@@ -73,20 +73,19 @@ class Binder {
    * return same instance of T
    */
   template<typename F, typename T>
-  void BindTypes(const std::string &name) throw(BindingError);
+  void BindTypes(const std::string &name);
 
   /**
    * Creates T -> instance binding
    */
   template<typename T>
-  void BindInstance(const std::shared_ptr<T> &instance) throw(BindingError);
+  void BindInstance(const std::shared_ptr<T> &instance);
 
   /**
    * Creates T (name) -> instance binding
    */
   template<typename T>
-  void BindInstance(const std::shared_ptr<T> &instance, const std::string &name)
-                throw(BindingError);
+  void BindInstance(const std::shared_ptr<T> &instance, const std::string &name);
 
   /**
    * Creates T -> Provider<T> binding
@@ -94,7 +93,7 @@ class Binder {
    * P must derive from Provider<T>
    */
   template<typename T, typename P>
-  void BindProvider() throw(BindingError);
+  void BindProvider();
 
   /**
    * Creates T (name) -> Provider<T> binding
@@ -102,7 +101,7 @@ class Binder {
    * P must derive from Provider<T>
    */
   template<typename T, typename P>
-  void BindProvider(const std::string &name) throw(BindingError);
+  void BindProvider(const std::string &name);
 
  private:
   const std::unordered_map<internal::Key, std::shared_ptr<Provider<void>>> &GetProviderBindings() const;

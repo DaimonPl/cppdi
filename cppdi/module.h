@@ -44,7 +44,7 @@ class Module {
    *
    * \param binder reference to binder on which bindings should be defined
    */
-  virtual void Configure(Binder &binder) const throw(BindingError) = 0;
+  virtual void Configure(Binder &binder) const = 0;
 };
 
 }  // namespace cppdi

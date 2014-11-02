@@ -26,7 +26,7 @@ class RawProviderWrapper : public Provider<T> {
 
   virtual ~RawProviderWrapper() = default;
 
-  virtual std::shared_ptr<T> Get() throw (InjectionError) override {
+  virtual std::shared_ptr<T> Get() override {
     return std::static_pointer_cast<T>(raw_provider_->Get());
   }
  private:

@@ -41,26 +41,25 @@ class Injector : public std::enable_shared_from_this<Injector> {
    * Gets instance of type T
    */
   template<typename T>
-  std::shared_ptr<T> GetInstance() throw (InjectionError);
+  std::shared_ptr<T> GetInstance();
 
   /**
    * Gets instance of named type T (name)
    */
   template<typename T>
-  std::shared_ptr<T> GetInstance(const std::string &name) throw (InjectionError);
+  std::shared_ptr<T> GetInstance(const std::string &name);
 
   /**
    * Gets provider of type T
    */
   template<typename T>
-  std::shared_ptr<Provider<T>> GetProvider() throw (InjectionError);
+  std::shared_ptr<Provider<T>> GetProvider();
 
   /**
    * Gets provider of named type T (name)
    */
   template<typename T>
-  std::shared_ptr<Provider<T>> GetProvider(const std::string &name)
-      throw (InjectionError);
+  std::shared_ptr<Provider<T>> GetProvider(const std::string &name);
 
   /**
    * Disposes injector to ensure that circular shared_ptr's between Injector
@@ -68,7 +67,7 @@ class Injector : public std::enable_shared_from_this<Injector> {
    *
    * Disposed injector (and providers which are using that injector instance)
    * cannot be used for further injections. All attempts will throw
-   * InjectionError
+   * InjectionError.
    *
    * If called on already disposed injector its behavior is no-operation.
    */
@@ -82,10 +81,8 @@ class Injector : public std::enable_shared_from_this<Injector> {
   };
 
   Injector(const Binder &binder);
-  std::shared_ptr<void> GetInstance(const internal::Key &key)
-      throw (InjectionError);
-  std::shared_ptr<Provider<void>> GetProvider(const internal::Key &key)
-      throw (InjectionError);
+  std::shared_ptr<void> GetInstance(const internal::Key &key);
+  std::shared_ptr<Provider<void>> GetProvider(const internal::Key &key);
 
   State state_;
   std::unordered_map<internal::Key, std::shared_ptr<Provider<void>>>provider_map_;
