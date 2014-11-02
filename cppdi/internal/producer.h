@@ -29,22 +29,10 @@ namespace internal {
 template<typename T>
 using Producer = std::function<std::shared_ptr<T>(const std::shared_ptr<Injector>&)>;
 
-template<typename T>
-Producer<T> make_producer();
-
-template<typename T, typename A>
-Producer<T> make_producer();
-
-template<typename T, typename A, typename B>
-Producer<T> make_producer();
-
-template<typename T, typename A, typename B, typename C>
-Producer<T> make_producer();
-
-template<typename T, typename A, typename B, typename C, typename D>
-Producer<T> make_producer();
-
-template<typename T, typename A, typename B, typename C, typename D, typename E>
+/**
+ * Creates producer of type T using constructor with arguments Args
+ */
+template<typename T, typename... Args>
 Producer<T> make_producer();
 
 }  // namespace internal

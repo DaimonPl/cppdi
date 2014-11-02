@@ -21,65 +21,12 @@
 namespace cppdi {
 namespace internal {
 
-template<typename T>
+template<typename T, typename... Args>
 Producer<T> make_producer() {
   return [](const std::shared_ptr<Injector> &injector)->std::shared_ptr<T> {
-    return std::shared_ptr<T>(new T());
-  };
-}
+    T *t = new T(injector->GetInstance<Args>()...);
 
-template<typename T, typename A>
-Producer<T> make_producer() {
-  return [](const std::shared_ptr<Injector> &injector)->std::shared_ptr<T> {
-    std::shared_ptr<A> a = injector->GetInstance<A>();
-
-    return std::shared_ptr<T>(new T(a));
-  };
-}
-
-template<typename T, typename A, typename B>
-Producer<T> make_producer() {
-  return [](const std::shared_ptr<Injector> &injector)->std::shared_ptr<T> {
-    std::shared_ptr<A> a = injector->GetInstance<A>();
-    std::shared_ptr<B> b = injector->GetInstance<B>();
-
-    return std::shared_ptr<T>(new T(a, b));
-  };
-}
-
-template<typename T, typename A, typename B, typename C>
-Producer<T> make_producer() {
-  return [](const std::shared_ptr<Injector> &injector)->std::shared_ptr<T> {
-    std::shared_ptr<A> a = injector->GetInstance<A>();
-    std::shared_ptr<B> b = injector->GetInstance<B>();
-    std::shared_ptr<C> c = injector->GetInstance<C>();
-
-    return std::shared_ptr<T>(new T(a, b, c));
-  };
-}
-
-template<typename T, typename A, typename B, typename C, typename D>
-Producer<T> make_producer() {
-  return [](const std::shared_ptr<Injector> &injector)->std::shared_ptr<T> {
-    std::shared_ptr<A> a = injector->GetInstance<A>();
-    std::shared_ptr<B> b = injector->GetInstance<B>();
-    std::shared_ptr<C> c = injector->GetInstance<C>();
-    std::shared_ptr<D> d = injector->GetInstance<D>();
-
-    return std::shared_ptr<T>(new T(a, b, c, d));
-  };
-}
-
-template<typename T, typename A, typename B, typename C, typename D, typename E>
-Producer<T> make_producer() {
-  return [](const std::shared_ptr<Injector> &injector)->std::shared_ptr<T> {
-    std::shared_ptr<A> a = injector->GetInstance<A>();
-    std::shared_ptr<B> b = injector->GetInstance<B>();
-    std::shared_ptr<C> c = injector->GetInstance<C>();
-    std::shared_ptr<D> d = injector->GetInstance<D>();
-    std::shared_ptr<E> e = injector->GetInstance<E>();
-
-    return std::shared_ptr<T>(new T(a, b, c, d, e));
+    return std::shared_ptr<T>(t);
   };
 }
 

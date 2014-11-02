@@ -24,8 +24,6 @@ namespace cppdi {
 
 template<typename T, typename ... Args>
 void Binder::BindConstructor() throw (BindingError) {
-  // TODO replace __constructor_lambda with less hardcoded solution
-  // (similar to std::make_shared)
   internal::Key key(typeid(T));
 
   AssertBindingNotExists(key);
