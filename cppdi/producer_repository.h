@@ -46,16 +46,18 @@ class ProducerRepository {
   static ProducerRepository &Instance();
 
   /**
-   * Registers type in repository - it requires type to have public, non-argument
-   * constructor.
+   * Registers type T with constructor arguments Args.
    *
-   * For types with parameterized constructors,
-   * Register(const Producer<T> &producer) should be used
+   * This registration method can be used only for constructors up to 5
+   * parameters with non-named shared_ptr arguments.
+   *
+   * If more complicated constructor is required, Register<T>(Producer<T>)
+   * should be used instead
    *
    * \throw BindingError if producer is already registered
    */
-  template<typename T>
-  void Register() throw (BindingError);
+  template<typename T, typename... Args>
+  void Register() throw(BindingError);
 
   /**
    * Registers producer in repository
