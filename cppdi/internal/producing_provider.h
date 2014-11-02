@@ -14,7 +14,7 @@
 
 #include <memory>
 
-#include "producer_repository_impl.h"
+#include "producer.h"
 
 namespace cppdi {
 

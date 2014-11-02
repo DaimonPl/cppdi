@@ -18,6 +18,7 @@
 #include "errors.h"
 #include "provider.h"
 #include "internal/key.h"
+#include "internal/producer.h"
 
 namespace cppdi {
 
@@ -28,6 +29,8 @@ class Injector;
  * type and concrete instance which is going to be injected.
  *
  * Following bindings are supported:
+ *  - constructor of Type
+ *  - Producer of type
  *  - Type -> ConcreteType (ConcreteType must derive from Type)
  *  - Type -> instance
  *  - Type -> Provider<Type>
@@ -41,13 +44,27 @@ class Injector;
 class Binder {
  public:
   /**
+   * Binds constructor of type T, identified by Args.
+   *
+   * This binding method can be used only for constructors up to 5
+   * parameters with non-named shared_ptr arguments.
+   *
+   * If more complicated constructor is required, BindProvider<T,P> should be
+   * used instead
+   *
+   * \throw BindingError if producer is already registered
+   */
+  template<typename T, typename ... Args>
+  void BindConstructor() throw (BindingError);
+
+  /**
    * Creates F -> T binding - T must derive from F.
    *
    * Created binding has singleton behaviour - i.e. all injections of F will
    * return same instance of T
    */
   template<typename F, typename T>
-  void Bind() throw(BindingError);
+  void BindTypes() throw(BindingError);
 
   /**
    * Creates F (name) -> T binding - T must derive from F
@@ -56,19 +73,19 @@ class Binder {
    * return same instance of T
    */
   template<typename F, typename T>
-  void Bind(const std::string &name) throw(BindingError);
+  void BindTypes(const std::string &name) throw(BindingError);
 
   /**
    * Creates T -> instance binding
    */
   template<typename T>
-  void Bind(const std::shared_ptr<T> &instance) throw(BindingError);
+  void BindInstance(const std::shared_ptr<T> &instance) throw(BindingError);
 
   /**
    * Creates T (name) -> instance binding
    */
   template<typename T>
-  void Bind(const std::shared_ptr<T> &instance, const std::string &name)
+  void BindInstance(const std::shared_ptr<T> &instance, const std::string &name)
                 throw(BindingError);
 
   /**
@@ -90,17 +107,18 @@ class Binder {
  private:
   const std::unordered_map<internal::Key, std::shared_ptr<Provider<void>>> &GetProviderBindings() const;
   const std::unordered_map<internal::Key, internal::Key> &GetLinkedBindings() const;
+  const std::unordered_map<internal::Key, internal::Producer<void>> &GetPoducerBindings() const;
 
   void AssertBindingNotExists(const internal::Key &key);
 
   std::unordered_map<internal::Key, std::shared_ptr<Provider<void>>> provider_map_;
   std::unordered_map<internal::Key, internal::Key> linked_bindings_map_;
+  std::unordered_map<internal::Key, internal::Producer<void>> producer_map_;
 
   friend Injector;
 };
 
-}
-  // namespace cppdi
+} // namespace cppdi
 
 #include "internal/binder_impl.h"
 

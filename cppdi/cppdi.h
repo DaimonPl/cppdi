@@ -24,7 +24,6 @@
 #include "injector.h"
 #include "injector_factory.h"
 #include "module.h"
-#include "producer_repository.h"
 #include "provider.h"
 
 #endif  // CPPDI_CPPDI_H_

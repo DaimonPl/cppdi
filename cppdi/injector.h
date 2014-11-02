@@ -19,6 +19,7 @@
 #include "errors.h"
 #include "provider.h"
 #include "internal/key.h"
+#include "internal/producer.h"
 
 namespace cppdi {
 
@@ -89,6 +90,7 @@ class Injector : public std::enable_shared_from_this<Injector> {
   State state_;
   std::unordered_map<internal::Key, std::shared_ptr<Provider<void>>>provider_map_;
   std::unordered_map<internal::Key, internal::Key> linked_bindings_map_;
+  std::unordered_map<internal::Key, internal::Producer<void>> producer_map_;
 
   friend InjectorFactory;
   friend internal::LinkingProvider;
@@ -100,5 +102,6 @@ class Injector : public std::enable_shared_from_this<Injector> {
 
 //  moved here due to file dependency
 #include "internal/linking_provider_impl.h"
+#include "internal/producer_impl.h"
 
 #endif  // CPPDI_INJECTOR_H_

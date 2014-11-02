@@ -16,7 +16,6 @@
 
 #include "../injector.h"
 #include "../provider.h"
-#include "../producer_repository.h"
 #include "raw_provider_wrapper.h"
 #include "linking_provider.h"
 #include "producing_provider.h"
@@ -26,6 +25,7 @@ namespace cppdi {
 Injector::Injector(const Binder &binder) {
   provider_map_ = binder.GetProviderBindings();
   linked_bindings_map_ = binder.GetLinkedBindings();
+  producer_map_ = binder.GetPoducerBindings();
   state_ = UNINITIALIZED;
 }
 
@@ -47,9 +47,15 @@ std::shared_ptr<Provider<void>> Injector::GetProvider(const internal::Key &key)
 
       provider_map_.emplace(linked_binding.first, provider);
     }
-
-    //providers were created, linked bindings map can be cleared
     linked_bindings_map_.clear();
+
+    for (auto &producer_binding : producer_map_) {
+      std::shared_ptr<Provider<void>> provider(
+          new internal::ProducingProvider(producer_binding.second));
+
+      provider_map_.emplace(producer_binding.first, provider);
+    }
+    producer_map_.clear();
 
     std::shared_ptr<Injector> this_ptr = shared_from_this();
 
@@ -60,19 +66,21 @@ std::shared_ptr<Provider<void>> Injector::GetProvider(const internal::Key &key)
 
   auto provider_it = provider_map_.find(key);
 
-  if (provider_it != provider_map_.end()) {
-    return provider_it->second;
+  if (provider_it == provider_map_.end()) {
+    throw InjectionError(std::string("No binding for ") + key.GetFullName());
   }
 
+  return provider_it->second;
+
   //binding does not exist, try to create producer-based one
-  Producer<void> producer = ProducerRepository::Instance().Get(key.GetType());
-  std::shared_ptr<Provider<void>> provider(
-      new internal::ProducingProvider(producer));
-  provider->Initialize(shared_from_this());
+  //Producer<void> producer = ProducerRepository::Instance().Get(key.GetType());
+  //std::shared_ptr<Provider<void>> provider(
+  //   new internal::ProducingProvider(producer));
+  //provider->Initialize(shared_from_this());
 
-  provider_map_.emplace(key, provider);
+  //provider_map_.emplace(key, provider);
 
-  return provider;
+  //return provider;
 }
 
 template<typename T>

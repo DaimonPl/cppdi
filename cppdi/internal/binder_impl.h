@@ -22,13 +22,26 @@
 
 namespace cppdi {
 
-template<typename F, typename T>
-void Binder::Bind() throw (BindingError) {
-  Bind<F, T>(std::string());
+template<typename T, typename ... Args>
+void Binder::BindConstructor() throw (BindingError) {
+  // TODO replace __constructor_lambda with less hardcoded solution
+  // (similar to std::make_shared)
+  internal::Key key(typeid(T));
+
+  AssertBindingNotExists(key);
+
+  internal::Producer<T> producer = internal::make_producer<T, Args...>();
+
+  producer_map_.emplace(key, producer);
 }
 
 template<typename F, typename T>
-void Binder::Bind(const std::string &name) throw (BindingError) {
+void Binder::BindTypes() throw (BindingError) {
+  BindTypes<F, T>(std::string());
+}
+
+template<typename F, typename T>
+void Binder::BindTypes(const std::string &name) throw (BindingError) {
   static_assert(std::is_base_of<F, T>::value,
       "T must be a descendant of F"
   );
@@ -45,13 +58,14 @@ void Binder::Bind(const std::string &name) throw (BindingError) {
 }
 
 template<typename T>
-void Binder::Bind(const std::shared_ptr<T> &instance) throw (BindingError) {
-  Binder::Bind<T>(instance, std::string());
+void Binder::BindInstance(const std::shared_ptr<T> &instance)
+    throw (BindingError) {
+  Binder::BindInstance<T>(instance, std::string());
 }
 
 template<typename T>
-void Binder::Bind(const std::shared_ptr<T> &instance, const std::string &name)
-                      throw (BindingError) {
+void Binder::BindInstance(const std::shared_ptr<T> &instance,
+                          const std::string &name) throw (BindingError) {
   internal::Key key(typeid(T), name);
   AssertBindingNotExists(key);
 
@@ -62,16 +76,15 @@ void Binder::Bind(const std::shared_ptr<T> &instance, const std::string &name)
 }
 
 template<typename T, typename P>
-void Binder::BindProvider()
-    throw (BindingError) {
+void Binder::BindProvider() throw (BindingError) {
   BindProvider<T, P>(std::string());
 }
 
 template<typename T, typename P>
 void Binder::BindProvider(const std::string &name) throw (BindingError) {
   static_assert(std::is_base_of<Provider<T>, P>::value,
-        "P must implement Provider<T>"
-    );
+      "P must implement Provider<T>"
+  );
 
   internal::Key key(typeid(T), name);
   AssertBindingNotExists(key);
@@ -86,7 +99,8 @@ void Binder::BindProvider(const std::string &name) throw (BindingError) {
 
 void Binder::AssertBindingNotExists(const internal::Key &key) {
   if (provider_map_.find(key) != provider_map_.end()
-      || linked_bindings_map_.find(key) != linked_bindings_map_.end()) {
+      || linked_bindings_map_.find(key) != linked_bindings_map_.end()
+      || producer_map_.find(key) != producer_map_.end()) {
     throw BindingError(
         std::string("Binding already exists for " + key.GetFullName()));
   }
@@ -95,8 +109,13 @@ void Binder::AssertBindingNotExists(const internal::Key &key) {
 const std::unordered_map<internal::Key, std::shared_ptr<Provider<void>>>& Binder::GetProviderBindings() const {
   return provider_map_;
 }
+
 const std::unordered_map<internal::Key, internal::Key>& Binder::GetLinkedBindings() const {
   return linked_bindings_map_;
+}
+
+const std::unordered_map<internal::Key, internal::Producer<void>> &Binder::GetPoducerBindings() const {
+  return producer_map_;
 }
 
 }  // namespace cppdi
