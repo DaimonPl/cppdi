@@ -46,8 +46,8 @@ class Binder {
   /**
    * Binds constructor of type T, identified by Args.
    *
-   * This binding method can be used only for constructors up to 5
-   * parameters with non-named shared_ptr arguments.
+   * This binding method can be used only for constructors with non-named
+   * shared_ptr arguments.
    *
    * If more complicated constructor is required, BindProvider<T,P> should be
    * used instead
