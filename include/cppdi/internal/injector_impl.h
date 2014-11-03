@@ -33,10 +33,8 @@ std::shared_ptr<void> Injector::GetInstance(const internal::Key &key) {
   return GetProvider(key)->Get();
 }
 
-std::shared_ptr<Provider<void>> Injector::GetProvider(const internal::Key &key) {
-  if (state_ == DISPOSED) {
-    throw InjectionError("Injector has been disposed!");
-  } else if (state_ == UNINITIALIZED) {
+void Injector::AutoInitialize() {
+  if (state_ == UNINITIALIZED) {
     state_ = INITIALIZED;
 
     for (auto &linked_binding : linked_bindings_map_) {
@@ -45,6 +43,7 @@ std::shared_ptr<Provider<void>> Injector::GetProvider(const internal::Key &key) 
 
       provider_map_.emplace(linked_binding.first, provider);
     }
+
     linked_bindings_map_.clear();
 
     for (auto &producer_binding : producer_map_) {
@@ -53,6 +52,7 @@ std::shared_ptr<Provider<void>> Injector::GetProvider(const internal::Key &key) 
 
       provider_map_.emplace(producer_binding.first, provider);
     }
+
     producer_map_.clear();
 
     std::shared_ptr<Injector> this_ptr = shared_from_this();
@@ -61,6 +61,14 @@ std::shared_ptr<Provider<void>> Injector::GetProvider(const internal::Key &key) 
       provider_binding.second->Initialize(this_ptr);
     }
   }
+}
+
+std::shared_ptr<Provider<void>> Injector::GetProvider(const internal::Key &key) {
+  if (state_ == DISPOSED) {
+    throw InjectionError("Injector has been disposed!");
+  }
+
+  AutoInitialize();
 
   auto provider_it = provider_map_.find(key);
 
@@ -69,16 +77,6 @@ std::shared_ptr<Provider<void>> Injector::GetProvider(const internal::Key &key) 
   }
 
   return provider_it->second;
-
-  //binding does not exist, try to create producer-based one
-  //Producer<void> producer = ProducerRepository::Instance().Get(key.GetType());
-  //std::shared_ptr<Provider<void>> provider(
-  //   new internal::ProducingProvider(producer));
-  //provider->Initialize(shared_from_this());
-
-  //provider_map_.emplace(key, provider);
-
-  //return provider;
 }
 
 template<typename T>
