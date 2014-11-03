@@ -40,7 +40,7 @@ struct Any {
   }
 
   template<typename U> Any(U&& value)
-      : ptr(new Derived<StorageType<U>>(forward<U>(value))) {}
+      : ptr(new Derived<StorageType<U>>(std::forward<U>(value))) {}
 
   template<class U> bool is() const {
     typedef StorageType<U> T;
@@ -121,7 +121,7 @@ struct Any {
 
   template<typename T>
   struct Derived : Base {
-    template<typename U> Derived(U&& value) : value(forward<U>(value)) {}
+    template<typename U> Derived(U&& value) : value(std::forward<U>(value)) {}
 
     T value;
 

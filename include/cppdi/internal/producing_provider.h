@@ -15,7 +15,6 @@
 #include <memory>
 
 #include "cppdi/provider.h"
-#include "cppdi/internal/producer.h"
 
 namespace cppdi {
 
@@ -23,32 +22,15 @@ class Injector;
 
 namespace internal {
 
-class ProducingProvider : public Provider<void> {
+template<typename T, typename... Args>
+class ProducingProvider : public Provider<Any> {
  public:
-  explicit ProducingProvider(const Producer<void> &producer)
-      : producer_(producer) {
-  }
-
-  virtual ~ProducingProvider() = default;
-
-  std::shared_ptr<void> Get() override {
-    if (!instance_) {
-      instance_ = producer_(injector_);
-
-      // instance was created, pointer to injector can be removed
-      injector_.reset();
-    }
-
-    return instance_;
-  }
+  Any Get() override;
 
  private:
-  void Initialize(const std::shared_ptr<cppdi::Injector> &injector) override {
-    injector_ = injector;
-  }
+  void Initialize(const std::shared_ptr<cppdi::Injector> &injector) override;
 
-  Producer<void> producer_;
-  std::shared_ptr<void> instance_;
+  Any instance_;
   std::shared_ptr<cppdi::Injector> injector_;
 };
 

@@ -12,25 +12,23 @@
 #ifndef CPPDI_INTERNAL_INSTANCE_PROVIDER_H_
 #define CPPDI_INTERNAL_INSTANCE_PROVIDER_H_
 
-#include <memory>
+#include "cppdi/internal/any.h"
 
 namespace cppdi {
 namespace internal {
 
 template<typename T>
-class InstanceProvider : public Provider<void> {
+class InstanceProvider : public Provider<Any> {
  public:
-  explicit InstanceProvider(const std::shared_ptr<T> &instance)
+  explicit InstanceProvider(const T &instance)
       : instance_(instance) {
   }
 
-  virtual ~InstanceProvider() = default;
-
-  std::shared_ptr<void> Get() override {
-    return std::static_pointer_cast<T>(instance_);
+  Any Get() override {
+    return instance_;
   }
  private:
-  std::shared_ptr<T> instance_;
+  Any instance_;
 };
 
 }  // namespace internal

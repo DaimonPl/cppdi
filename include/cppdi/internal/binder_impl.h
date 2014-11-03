@@ -20,18 +20,19 @@
 #include "cppdi/errors.h"
 #include "cppdi/internal/concrete_provider_wrapper.h"
 #include "cppdi/internal/instance_provider.h"
+#include "cppdi/internal/linking_provider.h"
+#include "cppdi/internal/producing_provider.h"
 
 namespace cppdi {
 
 template<typename T, typename ... Args>
 void Binder::BindConstructor() {
-  internal::Key key(typeid(T));
+  internal::Key key(typeid(std::shared_ptr<T>));
 
-  AssertBindingNotExists(key);
+  std::shared_ptr<Provider<internal::Any>> provider(
+          new internal::ProducingProvider<T, Args...>());
 
-  internal::Producer<T> producer = internal::make_producer<T, Args...>();
-
-  producer_map_.emplace(key, producer);
+  CreateBinding(key, provider);
 }
 
 template<typename F, typename T>
@@ -44,29 +45,26 @@ void Binder::BindTypes(const std::string &name) {
   static_assert(std::is_base_of<F, T>::value, "T must be a descendant of F");
   static_assert(!std::is_same<F, T>::value, "T cannot be same as F");
 
-  internal::Key source_key(typeid(F), name);
-  AssertBindingNotExists(source_key);
+  internal::Key source_key(typeid(std::shared_ptr<F>), name);
 
-  internal::Key target_key(typeid(T));
+  std::shared_ptr<Provider<internal::Any>> provider(
+        new internal::LinkingProvider<F, T>());
 
-  linked_bindings_map_.emplace(source_key, target_key);
+  CreateBinding(source_key, provider);
 }
 
 template<typename T>
-void Binder::BindInstance(const std::shared_ptr<T> &instance) {
+void Binder::BindInstance(const T &instance) {
   Binder::BindInstance<T>(instance, std::string());
 }
 
 template<typename T>
-void Binder::BindInstance(const std::shared_ptr<T> &instance,
-                          const std::string &name) {
+void Binder::BindInstance(const T &instance, const std::string &name) {
   internal::Key key(typeid(T), name);
-  AssertBindingNotExists(key);
 
-  std::shared_ptr<Provider<void>> provider(
+  std::shared_ptr<Provider<internal::Any>> provider(
       new internal::InstanceProvider<T>(instance));
-
-  provider_map_.emplace(key, provider);
+  CreateBinding(key, provider);
 }
 
 template<typename T, typename P>
@@ -79,35 +77,28 @@ void Binder::BindProvider(const std::string &name) {
   static_assert(std::is_base_of<Provider<T>, P>::value, "P must implement Provider<T>");
 
   internal::Key key(typeid(T), name);
-  AssertBindingNotExists(key);
-
   std::shared_ptr<P> provider(new P());
-
-  std::shared_ptr<Provider<void>> raw_provider(
+  std::shared_ptr<Provider<internal::Any>> any_provider(
       new internal::ConcreteProviderWrapper<T>(provider));
 
-  provider_map_.emplace(key, raw_provider);
+  CreateBinding(key, any_provider);
+}
+
+void Binder::CreateBinding(const internal::Key &key, const std::shared_ptr<Provider<internal::Any>> &provider) {
+  AssertBindingNotExists(key);
+
+  provider_map_.emplace(key, provider);
 }
 
 void Binder::AssertBindingNotExists(const internal::Key &key) {
-  if (provider_map_.find(key) != provider_map_.end()
-      || linked_bindings_map_.find(key) != linked_bindings_map_.end()
-      || producer_map_.find(key) != producer_map_.end()) {
+  if (provider_map_.find(key) != provider_map_.end()) {
     throw BindingError(
         std::string("Binding already exists for " + key.GetFullName()));
   }
 }
 
-const std::unordered_map<internal::Key, std::shared_ptr<Provider<void>>>& Binder::GetProviderBindings() const {
+const std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::Any>>>& Binder::GetProviderBindings() const {
   return provider_map_;
-}
-
-const std::unordered_map<internal::Key, internal::Key>& Binder::GetLinkedBindings() const {
-  return linked_bindings_map_;
-}
-
-const std::unordered_map<internal::Key, internal::Producer<void>> &Binder::GetPoducerBindings() const {
-  return producer_map_;
 }
 
 }  // namespace cppdi

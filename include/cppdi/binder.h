@@ -17,8 +17,8 @@
 
 #include "cppdi/errors.h"
 #include "cppdi/provider.h"
+#include "cppdi/internal/any.h"
 #include "cppdi/internal/key.h"
-#include "cppdi/internal/producer.h"
 
 namespace cppdi {
 
@@ -79,14 +79,13 @@ class Binder {
    * Creates T -> instance binding
    */
   template<typename T>
-  void BindInstance(const std::shared_ptr<T> &instance);
+  void BindInstance(const T &instance);
 
   /**
    * Creates T (name) -> instance binding
    */
   template<typename T>
-  void BindInstance(const std::shared_ptr<T> &instance,
-                    const std::string &name);
+  void BindInstance(const T &instance, const std::string &name);
 
   /**
    * Creates T -> Provider<T> binding
@@ -105,21 +104,18 @@ class Binder {
   void BindProvider(const std::string &name);
 
  private:
-  const std::unordered_map<internal::Key, std::shared_ptr<Provider<void>>>&GetProviderBindings() const;
-  const std::unordered_map<internal::Key, internal::Key> &GetLinkedBindings() const;
-  const std::unordered_map<internal::Key, internal::Producer<void>> &GetPoducerBindings() const;
-
+  const std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::Any>>>&GetProviderBindings() const;
   void AssertBindingNotExists(const internal::Key &key);
 
-  std::unordered_map<internal::Key, std::shared_ptr<Provider<void>>> provider_map_;
-  std::unordered_map<internal::Key, internal::Key> linked_bindings_map_;
-  std::unordered_map<internal::Key, internal::Producer<void>> producer_map_;
+  void CreateBinding(const internal::Key &key, const std::shared_ptr<Provider<internal::Any>> &provider);
+
+  std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::Any>>> provider_map_;
 
   friend Injector;
 };
 
 }  // namespace cppdi
 
-#include "internal/binder_impl.h"
+#include "cppdi/internal/binder_impl.h"
 
 #endif  // CPPDI_BINDER_H_

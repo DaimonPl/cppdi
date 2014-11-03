@@ -43,6 +43,6 @@ class InjectorFactory {
 
 }  // namespace cppdi
 
-#include "internal/injector_factory_impl.h"
+#include "cppdi/internal/injector_factory_impl.h"
 
 #endif  // CPPDI_INJECTOR_FACTORY_H_

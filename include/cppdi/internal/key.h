@@ -41,7 +41,15 @@ class Key {
   }
 
   const std::string GetFullName() const {
-    return std::string("Key{") + type_.name() + ',' + name_ + '}';
+    std::string fullName(std::string("Key{") + type_.name());
+
+    if (!name_.empty()) {
+      fullName += ',' + name_;
+    }
+
+    fullName += '}';
+
+    return fullName;
   }
 
   bool operator==(const Key& other) const {

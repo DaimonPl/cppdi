@@ -14,11 +14,13 @@
 
 #include <memory>
 
+#include "cppdi/internal/any.h"
+
 namespace cppdi {
 namespace internal {
 
 template<typename T>
-class ConcreteProviderWrapper : public Provider<void> {
+class ConcreteProviderWrapper : public Provider<Any> {
  public:
   explicit ConcreteProviderWrapper(
       const std::shared_ptr<Provider<T>> &concrete_provider)
@@ -27,8 +29,8 @@ class ConcreteProviderWrapper : public Provider<void> {
 
   virtual ~ConcreteProviderWrapper() = default;
 
-  std::shared_ptr<void> Get() override {
-    return std::static_pointer_cast<void>(concrete_provider_->Get());
+  Any Get() override {
+    return Any(concrete_provider_->Get());
   }
  private:
   std::shared_ptr<Provider<T>> concrete_provider_;

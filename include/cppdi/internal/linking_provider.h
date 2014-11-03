@@ -15,23 +15,19 @@
 #include <memory>
 
 #include "cppdi/injector.h"
-#include "cppdi/internal/key.h"
+#include "cppdi/internal/any.h"
 
 namespace cppdi {
 namespace internal {
 
-class LinkingProvider : public Provider<void> {
+template<typename F, typename T>
+class LinkingProvider : public Provider<Any> {
  public:
-  explicit LinkingProvider(const Key &target);
-
-  virtual ~LinkingProvider() = default;
-
-  std::shared_ptr<void> Get() override;
+  Any Get() override;
 
  private:
   void Initialize(const std::shared_ptr<cppdi::Injector> &injector) override;
 
-  Key target_;
   std::shared_ptr<cppdi::Injector> injector_;
 };
 

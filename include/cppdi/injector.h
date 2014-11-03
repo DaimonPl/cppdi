@@ -19,14 +19,10 @@
 #include "cppdi/binder.h"
 #include "cppdi/errors.h"
 #include "cppdi/provider.h"
+#include "cppdi/internal/any.h"
 #include "cppdi/internal/key.h"
-#include "cppdi/internal/producer.h"
 
 namespace cppdi {
-
-namespace internal {
-class LinkingProvider;
-}  // namespace internal
 
 class InjectorFactory;
 
@@ -42,25 +38,13 @@ class Injector : public std::enable_shared_from_this<Injector> {
    * Gets instance of type T
    */
   template<typename T>
-  std::shared_ptr<T> GetInstance();
+  T GetInstance();
 
   /**
    * Gets instance of named type T (name)
    */
   template<typename T>
-  std::shared_ptr<T> GetInstance(const std::string &name);
-
-  /**
-   * Gets provider of type T
-   */
-  template<typename T>
-  std::shared_ptr<Provider<T>> GetProvider();
-
-  /**
-   * Gets provider of named type T (name)
-   */
-  template<typename T>
-  std::shared_ptr<Provider<T>> GetProvider(const std::string &name);
+  T GetInstance(const std::string &name);
 
   /**
    * Disposes injector to ensure that circular shared_ptr's between Injector
@@ -82,25 +66,22 @@ class Injector : public std::enable_shared_from_this<Injector> {
   };
 
   explicit Injector(const Binder &binder);
-  std::shared_ptr<void> GetInstance(const internal::Key &key);
-  std::shared_ptr<Provider<void>> GetProvider(const internal::Key &key);
+  internal::Any GetInstanceByKey(const internal::Key &key);
+  std::shared_ptr<Provider<internal::Any>> GetProvider(const internal::Key &key);
   void AutoInitialize();
 
   State state_;
-  std::unordered_map<internal::Key, std::shared_ptr<Provider<void>>>provider_map_;
-  std::unordered_map<internal::Key, internal::Key> linked_bindings_map_;
-  std::unordered_map<internal::Key, internal::Producer<void>> producer_map_;
+  std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::Any>>>provider_map_;
 
   friend InjectorFactory;
-  friend internal::LinkingProvider;
 };
 
 }  // namespace cppdi
 
-#include "internal/injector_impl.h"
+#include "cppdi/internal/injector_impl.h"
 
 //  moved here due to file dependency
-#include "internal/linking_provider_impl.h"
-#include "internal/producer_impl.h"
+#include "cppdi/internal/linking_provider_impl.h"
+#include "cppdi/internal/producing_provider_impl.h"
 
 #endif  // CPPDI_INJECTOR_H_

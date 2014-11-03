@@ -25,36 +25,16 @@ namespace cppdi {
 
 Injector::Injector(const Binder &binder) {
   provider_map_ = binder.GetProviderBindings();
-  linked_bindings_map_ = binder.GetLinkedBindings();
-  producer_map_ = binder.GetPoducerBindings();
   state_ = UNINITIALIZED;
 }
 
-std::shared_ptr<void> Injector::GetInstance(const internal::Key &key) {
+internal::Any Injector::GetInstanceByKey(const internal::Key &key) {
   return GetProvider(key)->Get();
 }
 
 void Injector::AutoInitialize() {
   if (state_ == UNINITIALIZED) {
     state_ = INITIALIZED;
-
-    for (auto &linked_binding : linked_bindings_map_) {
-      std::shared_ptr<Provider<void>> provider(
-          new internal::LinkingProvider(linked_binding.second));
-
-      provider_map_.emplace(linked_binding.first, provider);
-    }
-
-    linked_bindings_map_.clear();
-
-    for (auto &producer_binding : producer_map_) {
-      std::shared_ptr<Provider<void>> provider(
-          new internal::ProducingProvider(producer_binding.second));
-
-      provider_map_.emplace(producer_binding.first, provider);
-    }
-
-    producer_map_.clear();
 
     std::shared_ptr<Injector> this_ptr = shared_from_this();
 
@@ -64,7 +44,7 @@ void Injector::AutoInitialize() {
   }
 }
 
-std::shared_ptr<Provider<void>> Injector::GetProvider(
+std::shared_ptr<Provider<internal::Any>> Injector::GetProvider(
     const internal::Key &key) {
   if (state_ == DISPOSED) {
     throw InjectionError("Injector has been disposed!");
@@ -82,30 +62,17 @@ std::shared_ptr<Provider<void>> Injector::GetProvider(
 }
 
 template<typename T>
-std::shared_ptr<T> Injector::GetInstance() {
+T Injector::GetInstance() {
   return GetInstance<T>(std::string());
 }
 
 template<typename T>
-std::shared_ptr<T> Injector::GetInstance(const std::string &name) {
+T Injector::GetInstance(const std::string &name) {
   internal::Key key(typeid(T), name);
 
-  return std::static_pointer_cast<T>(GetInstance(key));
-}
+  internal::Any instance = GetInstanceByKey(key);
 
-template<typename T>
-std::shared_ptr<Provider<T>> Injector::GetProvider() {
-  return GetProvider<T>(std::string());
-}
-
-template<typename T>
-std::shared_ptr<Provider<T>> Injector::GetProvider(const std::string &name) {
-  internal::Key key(typeid(T), name);
-
-  std::shared_ptr<Provider<T>> provider(
-      new internal::RawProviderWrapper<T>(GetProvider(key)));
-
-  return provider;
+  return instance.as<T>();
 }
 
 void Injector::Dispose() {
@@ -115,7 +82,6 @@ void Injector::Dispose() {
     // clearing collections, to cut cyclic dependency between Injector and
     // various Provider's
     provider_map_.clear();
-    linked_bindings_map_.clear();
   }
 }
 

@@ -15,6 +15,7 @@
 #include <memory>
 
 #include "cppdi/provider.h"
+#include "cppdi/internal/any.h"
 
 namespace cppdi {
 namespace internal {
@@ -23,17 +24,17 @@ template<typename T>
 class RawProviderWrapper : public Provider<T> {
  public:
   explicit RawProviderWrapper(
-      const std::shared_ptr<Provider<void>> &raw_provider)
+      const std::shared_ptr<Provider<Any>> &raw_provider)
       : raw_provider_(raw_provider) {
   }
 
-  virtual ~RawProviderWrapper() = default;
+  T Get() override {
+    return raw_provider_->Get().as<T>();
 
-  std::shared_ptr<T> Get() override {
-    return std::static_pointer_cast<T>(raw_provider_->Get());
+    return static_cast<T>(raw_provider_->Get());
   }
  private:
-  std::shared_ptr<Provider<void>> raw_provider_;
+  std::shared_ptr<Provider<Any>> raw_provider_;
 };
 
 }  // namespace internal

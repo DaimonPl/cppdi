@@ -37,7 +37,7 @@ class Provider {
   /**
    * Returns instance.
    */
-  virtual std::shared_ptr<T> Get() = 0;
+  virtual T Get() = 0;
  private:
   /**
    * Called once by cppdi internals. It's ensured that Initialize is called

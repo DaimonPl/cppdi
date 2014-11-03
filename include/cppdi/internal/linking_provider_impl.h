@@ -14,18 +14,20 @@
 
 #include <memory>
 
+#include "cppdi/internal/linking_provider.h"
+
 namespace cppdi {
 namespace internal {
 
-LinkingProvider::LinkingProvider(const Key &target)
-    : target_(target) {
+template<typename F, typename T>
+Any LinkingProvider<F, T>::Get() {
+  std::shared_ptr<T> instance = injector_->GetInstance<std::shared_ptr<T>>();
+
+  return Any(std::static_pointer_cast<F>(instance));
 }
 
-std::shared_ptr<void> LinkingProvider::Get() {
-  return injector_->GetInstance(target_);
-}
-
-void LinkingProvider::Initialize(
+template<typename F, typename T>
+void LinkingProvider<F, T>::Initialize(
     const std::shared_ptr<cppdi::Injector> &injector) {
   injector_ = injector;
 }
