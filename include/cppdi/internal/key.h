@@ -16,7 +16,7 @@
 #include <typeindex>
 #include <functional>
 
-#include "../errors.h"
+#include "cppdi/errors.h"
 
 namespace cppdi {
 namespace internal {
@@ -28,7 +28,7 @@ class Key {
         name_(name) {
   }
 
-  Key(const std::type_index &type)
+  explicit Key(const std::type_index &type)
       : type_(type) {
   }
 

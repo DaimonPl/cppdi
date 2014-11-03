@@ -16,7 +16,7 @@
 #include <typeindex>
 #include <functional>
 
-#include "../errors.h"
+#include "cppdi/errors.h"
 
 namespace cppdi {
 namespace internal {
@@ -32,7 +32,7 @@ using Producer = std::function<std::shared_ptr<T>(const std::shared_ptr<Injector
 /**
  * Creates producer of type T using constructor with arguments Args
  */
-template<typename T, typename... Args>
+template<typename T, typename ... Args>
 Producer<T> make_producer();
 
 }  // namespace internal

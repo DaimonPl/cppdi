@@ -15,10 +15,10 @@
 #include <string>
 #include <unordered_map>
 
-#include "errors.h"
-#include "provider.h"
-#include "internal/key.h"
-#include "internal/producer.h"
+#include "cppdi/errors.h"
+#include "cppdi/provider.h"
+#include "cppdi/internal/key.h"
+#include "cppdi/internal/producer.h"
 
 namespace cppdi {
 
@@ -85,7 +85,8 @@ class Binder {
    * Creates T (name) -> instance binding
    */
   template<typename T>
-  void BindInstance(const std::shared_ptr<T> &instance, const std::string &name);
+  void BindInstance(const std::shared_ptr<T> &instance,
+                    const std::string &name);
 
   /**
    * Creates T -> Provider<T> binding
@@ -104,7 +105,7 @@ class Binder {
   void BindProvider(const std::string &name);
 
  private:
-  const std::unordered_map<internal::Key, std::shared_ptr<Provider<void>>> &GetProviderBindings() const;
+  const std::unordered_map<internal::Key, std::shared_ptr<Provider<void>>>&GetProviderBindings() const;
   const std::unordered_map<internal::Key, internal::Key> &GetLinkedBindings() const;
   const std::unordered_map<internal::Key, internal::Producer<void>> &GetPoducerBindings() const;
 
@@ -117,7 +118,7 @@ class Binder {
   friend Injector;
 };
 
-} // namespace cppdi
+}  // namespace cppdi
 
 #include "internal/binder_impl.h"
 

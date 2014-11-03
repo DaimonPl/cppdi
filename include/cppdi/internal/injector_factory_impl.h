@@ -14,8 +14,8 @@
 
 #include <memory>
 
-#include "../injector_factory.h"
-#include "../binder.h"
+#include "cppdi/injector_factory.h"
+#include "cppdi/binder.h"
 
 namespace cppdi {
 
@@ -28,7 +28,7 @@ std::shared_ptr<Injector> InjectorFactory::Create(
   Binder binder;
 
   for (auto module : modules) {
-    module->Configure(binder);
+    module->Configure(&binder);
   }
 
   return std::shared_ptr<Injector>(new Injector(binder));

@@ -17,17 +17,18 @@
 namespace cppdi {
 namespace internal {
 
-  LinkingProvider::LinkingProvider(const Key &target)
-      : target_(target) {
-  }
+LinkingProvider::LinkingProvider(const Key &target)
+    : target_(target) {
+}
 
-  std::shared_ptr<void> LinkingProvider::Get() {
-    return injector_->GetInstance(target_);
-  }
+std::shared_ptr<void> LinkingProvider::Get() {
+  return injector_->GetInstance(target_);
+}
 
-  void LinkingProvider::Initialize(const std::shared_ptr<cppdi::Injector> &injector) {
-    injector_ = injector;
-  }
+void LinkingProvider::Initialize(
+    const std::shared_ptr<cppdi::Injector> &injector) {
+  injector_ = injector;
+}
 
 }  // namespace internal
 }  // namespace cppdi

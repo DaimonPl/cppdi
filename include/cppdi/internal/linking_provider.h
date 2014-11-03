@@ -14,8 +14,8 @@
 
 #include <memory>
 
-#include "../injector.h"
-#include "key.h"
+#include "cppdi/injector.h"
+#include "cppdi/internal/key.h"
 
 namespace cppdi {
 namespace internal {
@@ -26,11 +26,10 @@ class LinkingProvider : public Provider<void> {
 
   virtual ~LinkingProvider() = default;
 
-  virtual std::shared_ptr<void> Get() override;
+  std::shared_ptr<void> Get() override;
 
  private:
-  virtual void Initialize(const std::shared_ptr<cppdi::Injector> &injector)
-      override;
+  void Initialize(const std::shared_ptr<cppdi::Injector> &injector) override;
 
   Key target_;
   std::shared_ptr<cppdi::Injector> injector_;

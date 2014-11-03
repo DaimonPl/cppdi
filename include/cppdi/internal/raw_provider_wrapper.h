@@ -14,19 +14,22 @@
 
 #include <memory>
 
+#include "cppdi/provider.h"
+
 namespace cppdi {
 namespace internal {
 
 template<typename T>
 class RawProviderWrapper : public Provider<T> {
  public:
-  explicit RawProviderWrapper(const std::shared_ptr<Provider<void>> &raw_provider)
+  explicit RawProviderWrapper(
+      const std::shared_ptr<Provider<void>> &raw_provider)
       : raw_provider_(raw_provider) {
   }
 
   virtual ~RawProviderWrapper() = default;
 
-  virtual std::shared_ptr<T> Get() override {
+  std::shared_ptr<T> Get() override {
     return std::static_pointer_cast<T>(raw_provider_->Get());
   }
  private:

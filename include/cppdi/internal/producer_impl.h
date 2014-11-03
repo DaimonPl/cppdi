@@ -16,7 +16,7 @@
 #include <typeindex>
 #include <functional>
 
-#include "../errors.h"
+#include "cppdi/errors.h"
 
 namespace cppdi {
 namespace internal {

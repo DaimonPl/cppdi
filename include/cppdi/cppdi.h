@@ -18,12 +18,12 @@
  * User of cppdi should include only this file
  */
 
-#include "dispose_guard.h"
-#include "binder.h"
-#include "errors.h"
-#include "injector.h"
-#include "injector_factory.h"
-#include "module.h"
-#include "provider.h"
+#include "cppdi/dispose_guard.h"
+#include "cppdi/binder.h"
+#include "cppdi/errors.h"
+#include "cppdi/injector.h"
+#include "cppdi/injector_factory.h"
+#include "cppdi/module.h"
+#include "cppdi/provider.h"
 
 #endif  // CPPDI_CPPDI_H_

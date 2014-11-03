@@ -13,12 +13,13 @@
 #define CPPDI_INTERNAL_BINDER_IMPL_H_
 
 #include <memory>
+#include <string>
 #include <type_traits>
 
-#include "../binder.h"
-#include "../errors.h"
-#include "concrete_provider_wrapper.h"
-#include "instance_provider.h"
+#include "cppdi/binder.h"
+#include "cppdi/errors.h"
+#include "cppdi/internal/concrete_provider_wrapper.h"
+#include "cppdi/internal/instance_provider.h"
 
 namespace cppdi {
 
@@ -40,12 +41,8 @@ void Binder::BindTypes() {
 
 template<typename F, typename T>
 void Binder::BindTypes(const std::string &name) {
-  static_assert(std::is_base_of<F, T>::value,
-      "T must be a descendant of F"
-  );
-  static_assert(!std::is_same<F, T>::value,
-      "T cannot be same as F"
-  );
+  static_assert(std::is_base_of<F, T>::value, "T must be a descendant of F");
+  static_assert(!std::is_same<F, T>::value, "T cannot be same as F");
 
   internal::Key source_key(typeid(F), name);
   AssertBindingNotExists(source_key);
@@ -79,9 +76,7 @@ void Binder::BindProvider() {
 
 template<typename T, typename P>
 void Binder::BindProvider(const std::string &name) {
-  static_assert(std::is_base_of<Provider<T>, P>::value,
-      "P must implement Provider<T>"
-  );
+  static_assert(std::is_base_of<Provider<T>, P>::value, "P must implement Provider<T>");
 
   internal::Key key(typeid(T), name);
   AssertBindingNotExists(key);

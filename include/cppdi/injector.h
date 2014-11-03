@@ -13,13 +13,14 @@
 #define CPPDI_INJECTOR_H_
 
 #include <memory>
+#include <string>
 #include <unordered_map>
 
-#include "binder.h"
-#include "errors.h"
-#include "provider.h"
-#include "internal/key.h"
-#include "internal/producer.h"
+#include "cppdi/binder.h"
+#include "cppdi/errors.h"
+#include "cppdi/provider.h"
+#include "cppdi/internal/key.h"
+#include "cppdi/internal/producer.h"
 
 namespace cppdi {
 
@@ -80,7 +81,7 @@ class Injector : public std::enable_shared_from_this<Injector> {
     DISPOSED
   };
 
-  Injector(const Binder &binder);
+  explicit Injector(const Binder &binder);
   std::shared_ptr<void> GetInstance(const internal::Key &key);
   std::shared_ptr<Provider<void>> GetProvider(const internal::Key &key);
   void AutoInitialize();
@@ -94,7 +95,7 @@ class Injector : public std::enable_shared_from_this<Injector> {
   friend internal::LinkingProvider;
 };
 
-} // namespace cppdi
+}  // namespace cppdi
 
 #include "internal/injector_impl.h"
 

@@ -13,12 +13,13 @@
 #define CPPDI_INTERNAL_INJECTOR_IMPL_H_
 
 #include <memory>
+#include <string>
 
-#include "../injector.h"
-#include "../provider.h"
-#include "raw_provider_wrapper.h"
-#include "linking_provider.h"
-#include "producing_provider.h"
+#include "cppdi/injector.h"
+#include "cppdi/provider.h"
+#include "cppdi/internal/raw_provider_wrapper.h"
+#include "cppdi/internal/linking_provider.h"
+#include "cppdi/internal/producing_provider.h"
 
 namespace cppdi {
 
@@ -63,7 +64,8 @@ void Injector::AutoInitialize() {
   }
 }
 
-std::shared_ptr<Provider<void>> Injector::GetProvider(const internal::Key &key) {
+std::shared_ptr<Provider<void>> Injector::GetProvider(
+    const internal::Key &key) {
   if (state_ == DISPOSED) {
     throw InjectionError("Injector has been disposed!");
   }
@@ -110,8 +112,8 @@ void Injector::Dispose() {
   if (state_ != DISPOSED) {
     state_ = DISPOSED;
 
-    //clearing collections, to cut cyclic dependency between Injector and
-    //various Provider's
+    // clearing collections, to cut cyclic dependency between Injector and
+    // various Provider's
     provider_map_.clear();
     linked_bindings_map_.clear();
   }

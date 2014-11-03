@@ -15,8 +15,8 @@
 #include <initializer_list>
 #include <memory>
 
-#include "injector.h"
-#include "module.h"
+#include "cppdi/injector.h"
+#include "cppdi/module.h"
 
 namespace cppdi {
 

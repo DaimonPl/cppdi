@@ -14,7 +14,7 @@
 
 #include <memory>
 
-#include "errors.h"
+#include "cppdi/errors.h"
 
 namespace cppdi {
 

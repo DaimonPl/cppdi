@@ -29,7 +29,7 @@ struct Error {
   std::string message;
 
  protected:
-  Error(const std::string &msg)
+  explicit Error(const std::string &msg)
       : message(msg) {
   }
 };
@@ -38,7 +38,7 @@ struct Error {
  * Error during injection phase.
  */
 struct InjectionError : public Error {
-  InjectionError(const std::string &msg)
+  explicit InjectionError(const std::string &msg)
       : Error(msg) {
   }
 };
@@ -47,7 +47,7 @@ struct InjectionError : public Error {
  * Error during binding phase.
  */
 struct BindingError : public Error {
-  BindingError(const std::string &msg)
+  explicit BindingError(const std::string &msg)
       : Error(msg) {
   }
 };

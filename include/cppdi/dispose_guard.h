@@ -12,7 +12,7 @@
 #ifndef CPPDI_DISPOSE_GUARD_H_
 #define CPPDI_DISPOSE_GUARD_H_
 
-#include "injector.h"
+#include "cppdi/injector.h"
 
 namespace cppdi {
 

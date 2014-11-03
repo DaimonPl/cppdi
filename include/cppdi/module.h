@@ -12,8 +12,8 @@
 #ifndef CPPDI_MODULE_H_
 #define CPPDI_MODULE_H_
 
-#include "binder.h"
-#include "errors.h"
+#include "cppdi/binder.h"
+#include "cppdi/errors.h"
 
 namespace cppdi {
 
@@ -32,7 +32,7 @@ namespace cppdi {
  */
 class Module {
  public:
-  virtual ~Module() {};
+  virtual ~Module() {}
 
   /**
    * Method called by InjectorFactory during Injector creation.
@@ -44,7 +44,7 @@ class Module {
    *
    * \param binder reference to binder on which bindings should be defined
    */
-  virtual void Configure(Binder &binder) const = 0;
+  virtual void Configure(Binder *binder) const = 0;
 };
 
 }  // namespace cppdi

@@ -20,13 +20,14 @@ namespace internal {
 template<typename T>
 class ConcreteProviderWrapper : public Provider<void> {
  public:
-  explicit ConcreteProviderWrapper(const std::shared_ptr<Provider<T>> &concrete_provider)
+  explicit ConcreteProviderWrapper(
+      const std::shared_ptr<Provider<T>> &concrete_provider)
       : concrete_provider_(concrete_provider) {
   }
 
   virtual ~ConcreteProviderWrapper() = default;
 
-  virtual std::shared_ptr<void> Get() override {
+  std::shared_ptr<void> Get() override {
     return std::static_pointer_cast<void>(concrete_provider_->Get());
   }
  private:
