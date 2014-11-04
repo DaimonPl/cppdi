@@ -35,18 +35,12 @@ class B : public IB {
 };
 
 TEST(binding_to_type, simple) {
-  class TestModule : public Module {
-   public:
-    void Configure(Binder *binder) const override {
-      binder->BindConstructor<A>();
-      binder->BindTypes<IA, A>();
-    }
-  };
-
-  TestModule module;
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create(module);
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+    binder->BindConstructor<A>();
+    binder->BindTypes<IA, A>();
+  });
 
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<A>>());
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<IA>>());
@@ -55,20 +49,14 @@ TEST(binding_to_type, simple) {
 }
 
 TEST(binding_to_type, complex) {
-  class TestModule : public Module {
-   public:
-    void Configure(Binder *binder) const override {
-      binder->BindConstructor<A>();
-      binder->BindTypes<IA, A>();
-      binder->BindConstructor<B, shared_ptr<IA>>();
-      binder->BindTypes<IB, B>();
-    }
-  };
-
-  TestModule module;
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create(module);
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+    binder->BindConstructor<A>();
+    binder->BindTypes<IA, A>();
+    binder->BindConstructor<B, shared_ptr<IA>>();
+    binder->BindTypes<IB, B>();
+  });
 
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<B>>());
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<IB>>());

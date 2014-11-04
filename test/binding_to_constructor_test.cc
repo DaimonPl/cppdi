@@ -34,17 +34,11 @@ class C {
   };
 
 TEST(binding_to_constructor, no_argument) {
-  class TestModule : public Module {
-   public:
-    void Configure(Binder *binder) const override {
-      binder->BindConstructor<A>();
-    }
-  };
-
-  TestModule module;
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create(module);
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+    binder->BindConstructor<A>();
+  });
 
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<A>>());
   EXPECT_EQ(injector->GetInstance<shared_ptr<A>>(), injector->GetInstance<shared_ptr<A>>());
@@ -52,18 +46,12 @@ TEST(binding_to_constructor, no_argument) {
 }
 
 TEST(binding_to_constructor, with_primitive_argument) {
-  class TestModule : public Module {
-   public:
-    void Configure(Binder *binder) const override {
-      binder->BindConstructor<B, int>();
-      binder->BindInstance<int>(15);
-    }
-  };
-
-  TestModule module;
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create(module);
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+    binder->BindConstructor<B, int>();
+    binder->BindInstance<int>(15);
+  });
 
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<B>>());
   EXPECT_EQ(injector->GetInstance<shared_ptr<B>>(), injector->GetInstance<shared_ptr<B>>());
@@ -72,18 +60,12 @@ TEST(binding_to_constructor, with_primitive_argument) {
 }
 
 TEST(binding_to_constructor, with_type_argument) {
-  class TestModule : public Module {
-   public:
-    void Configure(Binder *binder) const override {
-      binder->BindConstructor<A>();
-      binder->BindConstructor<C, shared_ptr<A>>();
-    }
-  };
-
-  TestModule module;
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create(module);
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+    binder->BindConstructor<A>();
+    binder->BindConstructor<C, shared_ptr<A>>();
+  });
 
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<C>>());
   EXPECT_EQ(injector->GetInstance<shared_ptr<C>>(), injector->GetInstance<shared_ptr<C>>());

@@ -35,34 +35,22 @@ class IntP : public Provider<int> {
 
 
 TEST(binding_to_provider, primitive) {
-  class TestModule : public Module {
-   public:
-    void Configure(Binder *binder) const override {
-      binder->BindProvider<int, IntP>();
-    }
-  };
-
-  TestModule module;
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create(module);
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+    binder->BindProvider<int, IntP>();
+  });
 
   EXPECT_EQ(7, injector->GetInstance<int>());
   EXPECT_EQ(7, injector->GetInstance<shared_ptr<Provider<int>>>()->Get());
 }
 
 TEST(binding_to_provider, type) {
-  class TestModule : public Module {
-   public:
-    void Configure(Binder *binder) const override {
-      binder->BindProvider<shared_ptr<IA>, IaP>();
-    }
-  };
-
-  TestModule module;
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create(module);
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+    binder->BindProvider<shared_ptr<IA>, IaP>();
+  });
 
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<IA>>());
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<Provider<shared_ptr<IA>>>>()->Get());

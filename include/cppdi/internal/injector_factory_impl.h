@@ -34,6 +34,15 @@ inline std::shared_ptr<Injector> InjectorFactory::Create(
   return std::shared_ptr<Injector>(new Injector(binder));
 }
 
+inline std::shared_ptr<Injector> InjectorFactory::Create(
+      const std::function<void(Binder *binder)> &bindingFunction) {
+  Binder binder;
+
+  bindingFunction(&binder);
+
+  return std::shared_ptr<Injector>(new Injector(binder));
+}
+
 }  // namespace cppdi
 
 #endif  // CPPDI_INTERNAL_INJECTOR_FACTORY_IMPL_H_

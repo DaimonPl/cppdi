@@ -12,9 +12,11 @@
 #ifndef CPPDI_INJECTOR_FACTORY_H_
 #define CPPDI_INJECTOR_FACTORY_H_
 
+#include <functional>
 #include <initializer_list>
 #include <memory>
 
+#include "cppdi/binder.h"
 #include "cppdi/injector.h"
 #include "cppdi/module.h"
 
@@ -39,6 +41,16 @@ class InjectorFactory {
    */
   std::shared_ptr<Injector> Create(
       const std::initializer_list<const Module*> &modules) const;
+
+  /**
+   * Creates injector when bindings are created using provided binder function.
+   *
+   * Useful for situations when explicit Module class is not required.
+   *
+   * \bindingFunction function which can be used to define bindings
+   */
+  std::shared_ptr<Injector> Create(
+      const std::function<void(Binder *binder)> &bindingFunction);
 };
 
 }  // namespace cppdi

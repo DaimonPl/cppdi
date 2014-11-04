@@ -16,18 +16,12 @@ using namespace cppdi;
 using namespace std;
 
 TEST(binding_to_instance, primitives) {
-  class TestModule : public Module {
-   public:
-    void Configure(Binder *binder) const override {
-      binder->BindInstance<int>(5);
-      binder->BindInstance<long>(100);
-    }
-  };
-
-  TestModule module;
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create(module);
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+    binder->BindInstance<int>(5);
+    binder->BindInstance<long>(100);
+  });
 
   EXPECT_EQ(5, injector->GetInstance<int>());
   EXPECT_EQ(100, injector->GetInstance<long>());
@@ -37,17 +31,11 @@ TEST(binding_to_instance, primitives) {
 }
 
 TEST(binding_to_instance, strings) {
-  class TestModule : public Module {
-   public:
-    void Configure(Binder *binder) const override {
-      binder->BindInstance<string>(string("xyz"));
-    }
-  };
-
-  TestModule module;
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create(module);
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+    binder->BindInstance<string>(string("xyz"));
+  });
 
   EXPECT_EQ(string("xyz"), injector->GetInstance<string>());
   EXPECT_EQ(string("xyz"), injector->GetInstance<shared_ptr<Provider<string>>>()->Get());
@@ -57,18 +45,12 @@ TEST(binding_to_instance, pointers) {
   static int a = 7;
   static long b = 9;
 
-  class TestModule : public Module {
-   public:
-    void Configure(Binder *binder) const override {
-      binder->BindInstance<int*>(&a);
-      binder->BindInstance<long*>(&b);
-    }
-  };
-
-  TestModule module;
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create(module);
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+    binder->BindInstance<int*>(&a);
+    binder->BindInstance<long*>(&b);
+  });
 
   EXPECT_EQ(&a, injector->GetInstance<int*>());
   EXPECT_EQ(&b, injector->GetInstance<long*>());
