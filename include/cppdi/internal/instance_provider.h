@@ -17,10 +17,9 @@
 namespace cppdi {
 namespace internal {
 
-template<typename T>
 class InstanceProvider : public Provider<Any> {
  public:
-  explicit InstanceProvider(const T &instance)
+  explicit InstanceProvider(const Any &instance)
       : instance_(instance) {
   }
 

@@ -22,6 +22,7 @@
 #include "cppdi/internal/instance_provider.h"
 #include "cppdi/internal/linking_provider.h"
 #include "cppdi/internal/producing_provider.h"
+#include "cppdi/internal/raw_provider_wrapper.h"
 
 namespace cppdi {
 
@@ -30,9 +31,18 @@ void Binder::BindConstructor() {
   internal::Key key(typeid(std::shared_ptr<T>));
 
   std::shared_ptr<Provider<internal::Any>> provider(
-          new internal::ProducingProvider<T, Args...>());
+      new internal::ProducingProvider<T, Args...>());
 
   CreateBinding(key, provider);
+
+  //provider binding
+  internal::Key provider_of_provider_key(
+      typeid(std::shared_ptr<Provider<std::shared_ptr<T>>> ));
+  std::shared_ptr<Provider<std::shared_ptr<T>>> concrete_provider(new internal::RawProviderWrapper<std::shared_ptr<T>>(provider));
+  std::shared_ptr<Provider<internal::Any>> provider_of_provider(
+      new internal::InstanceProvider(internal::Any(concrete_provider)));
+
+  CreateBinding(provider_of_provider_key, provider_of_provider);
 }
 
 template<typename F, typename T>
@@ -48,9 +58,18 @@ void Binder::BindTypes(const std::string &name) {
   internal::Key source_key(typeid(std::shared_ptr<F>), name);
 
   std::shared_ptr<Provider<internal::Any>> provider(
-        new internal::LinkingProvider<F, T>());
+      new internal::LinkingProvider<F, T>());
 
   CreateBinding(source_key, provider);
+
+  //bind provider
+  internal::Key provider_of_provider_key(
+        typeid(std::shared_ptr<Provider<std::shared_ptr<F>>> ));
+    std::shared_ptr<Provider<std::shared_ptr<F>>> concrete_provider(new internal::RawProviderWrapper<std::shared_ptr<F>>(provider));
+    std::shared_ptr<Provider<internal::Any>> provider_of_provider(
+        new internal::InstanceProvider(internal::Any(concrete_provider)));
+
+    CreateBinding(provider_of_provider_key, provider_of_provider);
 }
 
 template<typename T>
@@ -63,8 +82,17 @@ void Binder::BindInstance(const T &instance, const std::string &name) {
   internal::Key key(typeid(T), name);
 
   std::shared_ptr<Provider<internal::Any>> provider(
-      new internal::InstanceProvider<T>(instance));
+      new internal::InstanceProvider(internal::Any(instance)));
   CreateBinding(key, provider);
+
+  //provider binding
+  internal::Key provider_of_provider_key(typeid(std::shared_ptr<Provider<T>>));
+  std::shared_ptr<Provider<T>> concrete_provider(
+      new internal::RawProviderWrapper<T>(provider));
+  std::shared_ptr<Provider<internal::Any>> provider_of_provider(
+      new internal::InstanceProvider(internal::Any(concrete_provider)));
+
+  CreateBinding(provider_of_provider_key, provider_of_provider);
 }
 
 template<typename T, typename P>
@@ -77,30 +105,41 @@ void Binder::BindProvider(const std::string &name) {
   static_assert(std::is_base_of<Provider<T>, P>::value, "P must implement Provider<T>");
 
   internal::Key key(typeid(T), name);
-  std::shared_ptr<P> provider(new P());
+  std::shared_ptr<Provider<T>> provider(new P());
   std::shared_ptr<Provider<internal::Any>> any_provider(
       new internal::ConcreteProviderWrapper<T>(provider));
 
   CreateBinding(key, any_provider);
+
+  //bind provider
+  internal::Key provider_of_provider_key(typeid(std::shared_ptr<Provider<T>>));
+  std::shared_ptr<Provider<internal::Any>> provider_of_provider(
+        new internal::InstanceProvider(internal::Any(provider)));
+
+  CreateBinding(provider_of_provider_key, provider_of_provider);
 }
 
-void Binder::CreateBinding(const internal::Key &key, const std::shared_ptr<Provider<internal::Any>> &provider) {
+inline void Binder::CreateBinding(
+    const internal::Key &key,
+    const std::shared_ptr<Provider<internal::Any>> &provider) {
   AssertBindingNotExists(key);
 
   provider_map_.emplace(key, provider);
 }
 
-void Binder::AssertBindingNotExists(const internal::Key &key) {
+inline void Binder::AssertBindingNotExists(const internal::Key &key) {
   if (provider_map_.find(key) != provider_map_.end()) {
     throw BindingError(
         std::string("Binding already exists for " + key.GetFullName()));
   }
 }
 
-const std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::Any>>>& Binder::GetProviderBindings() const {
+inline const std::unordered_map<internal::Key,
+    std::shared_ptr<Provider<internal::Any>>>&Binder::GetProviderBindings() const {
   return provider_map_;
 }
 
-}  // namespace cppdi
+}
+  // namespace cppdi
 
 #endif  // CPPDI_INTERNAL_BINDER_IMPL_H_

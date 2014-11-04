@@ -23,16 +23,16 @@
 
 namespace cppdi {
 
-Injector::Injector(const Binder &binder) {
+inline Injector::Injector(const Binder &binder) {
   provider_map_ = binder.GetProviderBindings();
   state_ = UNINITIALIZED;
 }
 
-internal::Any Injector::GetInstanceByKey(const internal::Key &key) {
+inline internal::Any Injector::GetInstanceByKey(const internal::Key &key) {
   return GetProvider(key)->Get();
 }
 
-void Injector::AutoInitialize() {
+inline void Injector::AutoInitialize() {
   if (state_ == UNINITIALIZED) {
     state_ = INITIALIZED;
 
@@ -44,7 +44,7 @@ void Injector::AutoInitialize() {
   }
 }
 
-std::shared_ptr<Provider<internal::Any>> Injector::GetProvider(
+inline std::shared_ptr<Provider<internal::Any>> Injector::GetProvider(
     const internal::Key &key) {
   if (state_ == DISPOSED) {
     throw InjectionError("Injector has been disposed!");
@@ -75,7 +75,7 @@ T Injector::GetInstance(const std::string &name) {
   return instance.as<T>();
 }
 
-void Injector::Dispose() {
+inline void Injector::Dispose() {
   if (state_ != DISPOSED) {
     state_ = DISPOSED;
 

@@ -27,8 +27,6 @@ class ConcreteProviderWrapper : public Provider<Any> {
       : concrete_provider_(concrete_provider) {
   }
 
-  virtual ~ConcreteProviderWrapper() = default;
-
   Any Get() override {
     return Any(concrete_provider_->Get());
   }

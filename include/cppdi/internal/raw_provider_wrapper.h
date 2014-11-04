@@ -30,8 +30,6 @@ class RawProviderWrapper : public Provider<T> {
 
   T Get() override {
     return raw_provider_->Get().as<T>();
-
-    return static_cast<T>(raw_provider_->Get());
   }
  private:
   std::shared_ptr<Provider<Any>> raw_provider_;

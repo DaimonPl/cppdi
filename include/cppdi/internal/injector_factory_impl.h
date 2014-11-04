@@ -19,11 +19,11 @@
 
 namespace cppdi {
 
-std::shared_ptr<Injector> InjectorFactory::Create(const Module &module) const {
+inline std::shared_ptr<Injector> InjectorFactory::Create(const Module &module) const {
   return Create({ &module });
 }
 
-std::shared_ptr<Injector> InjectorFactory::Create(
+inline std::shared_ptr<Injector> InjectorFactory::Create(
     const std::initializer_list<const Module*> &modules) const {
   Binder binder;
 
