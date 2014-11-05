@@ -52,8 +52,8 @@ void Binder::BindTypes() {
 
 template<typename F, typename T>
 void Binder::BindTypes(const std::string &name) {
-  static_assert(std::is_base_of<F, T>::value, "T must be a descendant of F");
-  static_assert(!std::is_same<F, T>::value, "T cannot be same as F");
+  static_assert(std::is_base_of<F, T>::value, "BindTypes<F, T>() - T must be a descendant of F");
+  static_assert(!std::is_same<F, T>::value, "BindTypes<F, T>() - T cannot be same as F");
 
   internal::Key source_key(typeid(std::shared_ptr<F>), name);
 
@@ -64,12 +64,12 @@ void Binder::BindTypes(const std::string &name) {
 
   //bind provider
   internal::Key provider_of_provider_key(
-        typeid(std::shared_ptr<Provider<std::shared_ptr<F>>> ));
-    std::shared_ptr<Provider<std::shared_ptr<F>>> concrete_provider(new internal::RawProviderWrapper<std::shared_ptr<F>>(provider));
-    std::shared_ptr<Provider<internal::Any>> provider_of_provider(
-        new internal::InstanceProvider(internal::Any(concrete_provider)));
+      typeid(std::shared_ptr<Provider<std::shared_ptr<F>>> ));
+  std::shared_ptr<Provider<std::shared_ptr<F>>> concrete_provider(new internal::RawProviderWrapper<std::shared_ptr<F>>(provider));
+  std::shared_ptr<Provider<internal::Any>> provider_of_provider(
+      new internal::InstanceProvider(internal::Any(concrete_provider)));
 
-    CreateBinding(provider_of_provider_key, provider_of_provider);
+  CreateBinding(provider_of_provider_key, provider_of_provider);
 }
 
 template<typename T>
@@ -102,7 +102,7 @@ void Binder::BindProvider() {
 
 template<typename T, typename P>
 void Binder::BindProvider(const std::string &name) {
-  static_assert(std::is_base_of<Provider<T>, P>::value, "P must implement Provider<T>");
+  static_assert(std::is_base_of<Provider<T>, P>::value, "BindProvider<T, P>() - P must implement Provider<T>");
 
   internal::Key key(typeid(T), name);
   std::shared_ptr<Provider<T>> provider(new P());
@@ -114,7 +114,7 @@ void Binder::BindProvider(const std::string &name) {
   //bind provider
   internal::Key provider_of_provider_key(typeid(std::shared_ptr<Provider<T>>));
   std::shared_ptr<Provider<internal::Any>> provider_of_provider(
-        new internal::InstanceProvider(internal::Any(provider)));
+      new internal::InstanceProvider(internal::Any(provider)));
 
   CreateBinding(provider_of_provider_key, provider_of_provider);
 }
