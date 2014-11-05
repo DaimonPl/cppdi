@@ -31,7 +31,6 @@ class InjectorFactory;
  *
  * Following bindings are supported:
  *  - constructor of Type
- *  - Producer of type
  *  - Type -> ConcreteType (ConcreteType must derive from Type)
  *  - Type -> instance
  *  - Type -> Provider<Type>
@@ -45,45 +44,59 @@ class InjectorFactory;
 class Binder {
  public:
   /**
-   * Binds constructor of type T, identified by Args.
+   * Binds constructor of type T, identified by arguments Args.
    *
    * This binding method can be used only for constructors with non-named
-   * shared_ptr arguments.
+   * arguments.
    *
    * If more complicated constructor is required, BindProvider<T,P> should be
-   * used instead
+   * used instead.
    *
-   * \throw BindingError if producer is already registered
+   * Types bound by this method have singleton behavior and can be injected as:
+   *  - shared_ptr<T>
+   *  - shared_ptr<Provider<shared_ptr<T>>>
+   *
+   * @throw BindingError if binding for shared_ptr<T> already exist
    */
   template<typename T, typename ... Args>
   void BindConstructor();
 
   /**
-   * Creates F -> T binding - T must derive from F.
+   * Creates shared_ptr<F> -> shared_ptr<T> binding - T must derive from F.
    *
-   * Created binding has singleton behaviour - i.e. all injections of F will
-   * return same instance of T
+   * Binding creates by this method shares behavior of T - i.e. if T is singleton
+   * binding, then F would be singleton as well.
+   *
+   * Types bound by this method can be injected as:
+   *  - shared_ptr<F>
+   *  - shared_ptr<Provider<shared_ptr<F>>>
+   *
+   * @throw BindingError if binding for shared_ptr<F> already exist
    */
   template<typename F, typename T>
   void BindTypes();
 
   /**
-   * Creates F (name) -> T binding - T must derive from F
-   *
-   * Created binding has singleton behaviour - i.e. all injections of F will
-   * return same instance of T
+   * Has same behavior as BindTypes<F, T>() but creates named binding of F.
    */
   template<typename F, typename T>
   void BindTypes(const std::string &name);
 
   /**
    * Creates T -> instance binding
+   *
+   * Types bound by this method can be injected as:
+   *  - T
+   *  - shared_ptr<Provider<T>>
+   *
+   * @throw BindingError if binding for T already exist
    */
   template<typename T>
   void BindInstance(const T &instance);
 
   /**
-   * Creates T (name) -> instance binding
+   * Has same behavior as BindInstance<T>(const T&) but creates named binding
+   * of T.
    */
   template<typename T>
   void BindInstance(const T &instance, const std::string &name);
@@ -91,15 +104,19 @@ class Binder {
   /**
    * Creates T -> Provider<T> binding
    *
-   * P must derive from Provider<T>
+   * P must derive from Provider<T> and have public, non-argument constructor.
+   *
+   * Types bound by this method can be injected as:
+   *  - T
+   *  - shared_ptr<Provider<T>>
+   *
+   * @throw BindingError if binding for T already exist
    */
   template<typename T, typename P>
   void BindProvider();
 
   /**
-   * Creates T (name) -> Provider<T> binding
-   *
-   * P must derive from Provider<T>
+   * Has same behavior as BindProvider<T, P>() but creates named binding of T.
    */
   template<typename T, typename P>
   void BindProvider(const std::string &name);

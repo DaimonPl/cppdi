@@ -26,8 +26,9 @@ class Injector;
  * Concrete implementation may implement singleton or non-singleton instance
  * providing behavior.
  *
- * Custom provider implementations MUST use no-argument constructor. In case
- * initialization is required, Initialize method can be used for that purpose.
+ * Custom provider implementations MUST use no-argument, public constructor.
+ * In case initialization is required, Initialize method can be used for that
+ * purpose.
  */
 template<typename T>
 class Provider {
@@ -35,7 +36,7 @@ class Provider {
   virtual ~Provider() = default;
 
   /**
-   * Returns instance.
+   * Returns instance of T.
    */
   virtual T Get() = 0;
  private:
@@ -43,7 +44,7 @@ class Provider {
    * Called once by cppdi internals. It's ensured that Initialize is called
    * always before first Get call.
    *
-   * \param injector injector which shares same scope as this Provider instance.
+   * @param injector injector which shares same scope as this Provider instance.
    *        can be used to initialize provider with other dependencies.
    */
   virtual void Initialize(const std::shared_ptr<Injector> &injector) {}

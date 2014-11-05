@@ -30,14 +30,18 @@ class InjectorFactory {
   /**
    * Creates injector from single module
    *
-   * \param module module to create injector from
+   * @param module module to create injector from
+   *
+   * @throw BindingError if provided module defines illegal bindings
    */
   std::shared_ptr<Injector> Create(const Module &module) const;
 
   /**
    * Creates injector from module initialization list
    *
-   * \param modules initialization list of modules
+   * @param modules initialization list of modules
+   *
+   * @throw BindingError if combined modules define illegal bindings
    */
   std::shared_ptr<Injector> Create(
       const std::initializer_list<const Module*> &modules) const;
@@ -47,10 +51,12 @@ class InjectorFactory {
    *
    * Useful for situations when explicit Module class is not required.
    *
-   * \bindingFunction function which can be used to define bindings
+   * @binding_function function which can be used to define bindings
+   *
+   * @throw BindingError if provided function defines illegal bindings
    */
   std::shared_ptr<Injector> Create(
-      const std::function<void(Binder *binder)> &bindingFunction);
+      const std::function<void(Binder *binder)> &binding_function);
 };
 
 }  // namespace cppdi

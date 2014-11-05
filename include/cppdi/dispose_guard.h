@@ -17,7 +17,7 @@
 namespace cppdi {
 
 /**
- * Guard which ensures that Dispose is called on Injector
+ * Guard which ensures that Dispose() is called on Injector
  */
 class DisposeGuard {
  public:

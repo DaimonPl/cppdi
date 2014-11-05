@@ -35,10 +35,10 @@ inline std::shared_ptr<Injector> InjectorFactory::Create(
 }
 
 inline std::shared_ptr<Injector> InjectorFactory::Create(
-      const std::function<void(Binder *binder)> &bindingFunction) {
+      const std::function<void(Binder *binder)> &binding_function) {
   Binder binder;
 
-  bindingFunction(&binder);
+  binding_function(&binder);
 
   return std::shared_ptr<Injector>(new Injector(binder));
 }

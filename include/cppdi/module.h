@@ -24,10 +24,6 @@ namespace cppdi {
  * It's meant to create re-usable code modules which can be reused in different
  * parts/projects without need to re-define bindings (especially internal ones).
  *
- * For example Interface -> Concrete (where Concrete implements Interface)
- * represents type binding - all requests for Interface would evaluate to
- * Concrete type.
- *
  * Module implementations MUST be stateless.
  */
 class Module {
@@ -36,13 +32,16 @@ class Module {
 
   /**
    * Method called by InjectorFactory during Injector creation.
+   *
    * Method is called only once for particular Binder. It can be called multiple
    * times (with different binders as parameters).
    *
-   * Implementation should create all corresponding bindings on provider Binder
-   * instance.
+   * Implementation should create all corresponding bindings on passed Binder
+   * pointer.
    *
-   * \param binder reference to binder on which bindings should be defined
+   * @param binder pointer to binder on which bindings should be defined
+   *
+   * @throw BindingError if methods called on binder throw BindingError
    */
   virtual void Configure(Binder *binder) const = 0;
 };

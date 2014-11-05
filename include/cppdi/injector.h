@@ -27,21 +27,28 @@ namespace cppdi {
 class InjectorFactory;
 
 /**
- * Main role of Injector is creation of object graphs. Type dependencies
- * (constructor arguments) are obtained basing on bindings defined in Module.
+ * Main role of Injector is creation of object graphs. It acts as entry-point to
+ * cppdi and maintains its own scope (singleton instances created by different
+ * injectors won't have same address).
  *
- * Injector is obtained from InjectorFactory.
+ * In case injected type has constructor arguments, Injector will automatically
+ * (and recursively) obtain instances from its scope.
+ *
+ * Injector can be obtained only from InjectorFactory as shared_ptr<Injector>.
  */
 class Injector : public std::enable_shared_from_this<Injector> {
  public:
   /**
    * Gets instance of type T
+   *
+   * @throw InjectionError if injector has been disposed or bindings are missing
+   *        for requested type and/or its dependencies
    */
   template<typename T>
   T GetInstance();
 
   /**
-   * Gets instance of named type T (name)
+   * Has same behavor as GetInstance<T> but returns named instance of T.
    */
   template<typename T>
   T GetInstance(const std::string &name);
