@@ -37,7 +37,7 @@ void Binder::BindConstructor() {
 
   //provider binding
   internal::Key provider_of_provider_key(
-      typeid(std::shared_ptr<Provider<std::shared_ptr<T>>> ));
+      typeid(std::shared_ptr<Provider<std::shared_ptr<T>>>));
   std::shared_ptr<Provider<std::shared_ptr<T>>> concrete_provider(new internal::RawProviderWrapper<std::shared_ptr<T>>(provider));
   std::shared_ptr<Provider<internal::Any>> provider_of_provider(
       new internal::InstanceProvider(internal::Any(concrete_provider)));
@@ -64,7 +64,7 @@ void Binder::BindTypes(const std::string &name) {
 
   //bind provider
   internal::Key provider_of_provider_key(
-      typeid(std::shared_ptr<Provider<std::shared_ptr<F>>> ));
+      typeid(std::shared_ptr<Provider<std::shared_ptr<F>>>), name);
   std::shared_ptr<Provider<std::shared_ptr<F>>> concrete_provider(new internal::RawProviderWrapper<std::shared_ptr<F>>(provider));
   std::shared_ptr<Provider<internal::Any>> provider_of_provider(
       new internal::InstanceProvider(internal::Any(concrete_provider)));
@@ -86,7 +86,7 @@ void Binder::BindInstance(const T &instance, const std::string &name) {
   CreateBinding(key, provider);
 
   //provider binding
-  internal::Key provider_of_provider_key(typeid(std::shared_ptr<Provider<T>>));
+  internal::Key provider_of_provider_key(typeid(std::shared_ptr<Provider<T>>), name);
   std::shared_ptr<Provider<T>> concrete_provider(
       new internal::RawProviderWrapper<T>(provider));
   std::shared_ptr<Provider<internal::Any>> provider_of_provider(
@@ -112,7 +112,7 @@ void Binder::BindProvider(const std::string &name) {
   CreateBinding(key, any_provider);
 
   //bind provider
-  internal::Key provider_of_provider_key(typeid(std::shared_ptr<Provider<T>>));
+  internal::Key provider_of_provider_key(typeid(std::shared_ptr<Provider<T>>), name);
   std::shared_ptr<Provider<internal::Any>> provider_of_provider(
       new internal::InstanceProvider(internal::Any(provider)));
 
