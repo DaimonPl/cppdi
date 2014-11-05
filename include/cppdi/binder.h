@@ -23,6 +23,7 @@
 namespace cppdi {
 
 class Injector;
+class InjectorFactory;
 
 /**
  * Binder is used to define (in declarative way) relations between injected
@@ -103,7 +104,14 @@ class Binder {
   template<typename T, typename P>
   void BindProvider(const std::string &name);
 
+  // ensure binder is not passed by value
+  Binder(const Binder &) = delete;
+  Binder(Binder &&) = delete;
+  void operator=(const Binder &) = delete;
+  void operator=(Binder &&) = delete;
  private:
+  Binder() {};
+
   const std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::Any>>>&GetProviderBindings() const;
   void AssertBindingNotExists(const internal::Key &key);
 
@@ -112,6 +120,7 @@ class Binder {
   std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::Any>>> provider_map_;
 
   friend Injector;
+  friend InjectorFactory;
 };
 
 }  // namespace cppdi

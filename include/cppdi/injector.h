@@ -58,6 +58,12 @@ class Injector : public std::enable_shared_from_this<Injector> {
    */
   void Dispose();
 
+  // ensure injector is not passed by value
+  Injector(const Injector &) = delete;
+  Injector(Injector &&) = delete;
+  void operator=(const Injector &) = delete;
+  void operator=(Injector &&) = delete;
+
  private:
   enum State {
     UNINITIALIZED,
