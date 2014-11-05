@@ -29,15 +29,30 @@ class IB {
 
 class B : public IB {
  public:
-  B(shared_ptr<IA> a) {a_=a;};
+  B(shared_ptr<IA> a) {
+    a_ = a;
+  }
+
 
   shared_ptr<IA> a_;
+};
+
+class IX {
+
+};
+
+class IY {
+
+};
+
+class XY : public IX, public IY {
+
 };
 
 TEST(binding_to_type, simple) {
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
     binder->BindConstructor<A>();
     binder->BindTypes<IA, A>();
   });
@@ -48,10 +63,28 @@ TEST(binding_to_type, simple) {
   EXPECT_EQ(injector->GetInstance<shared_ptr<Provider<shared_ptr<A>>>>()->Get(), injector->GetInstance<shared_ptr<Provider<shared_ptr<IA>>>>()->Get());
 }
 
+TEST(binding_to_type, multi_inheritance) {
+  cppdi::InjectorFactory factory;
+
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
+    binder->BindConstructor<XY>();
+    binder->BindTypes<IX, XY>();
+    binder->BindTypes<IY, XY>();
+  });
+
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<XY>>());
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<IX>>());
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<IY>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<IX>>(), injector->GetInstance<shared_ptr<XY>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<IY>>(), injector->GetInstance<shared_ptr<XY>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<Provider<shared_ptr<IX>>>>()->Get(), injector->GetInstance<shared_ptr<Provider<shared_ptr<XY>>>>()->Get());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<Provider<shared_ptr<IY>>>>()->Get(), injector->GetInstance<shared_ptr<Provider<shared_ptr<XY>>>>()->Get());
+}
+
 TEST(binding_to_type, complex) {
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
     binder->BindConstructor<A>();
     binder->BindTypes<IA, A>();
     binder->BindConstructor<B, shared_ptr<IA>>();

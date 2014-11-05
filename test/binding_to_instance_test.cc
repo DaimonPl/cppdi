@@ -18,7 +18,7 @@ using namespace std;
 TEST(binding_to_instance, primitives) {
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
     binder->BindInstance<int>(5);
     binder->BindInstance<long>(100);
   });
@@ -33,7 +33,7 @@ TEST(binding_to_instance, primitives) {
 TEST(binding_to_instance, strings) {
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
     binder->BindInstance<string>(string("xyz"));
   });
 
@@ -47,7 +47,7 @@ TEST(binding_to_instance, pointers) {
 
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
     binder->BindInstance<int*>(&a);
     binder->BindInstance<long*>(&b);
   });
