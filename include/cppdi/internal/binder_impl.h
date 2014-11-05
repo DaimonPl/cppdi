@@ -15,6 +15,7 @@
 #include <memory>
 #include <string>
 #include <type_traits>
+#include <typeinfo>
 
 #include "cppdi/binder.h"
 #include "cppdi/errors.h"

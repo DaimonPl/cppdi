@@ -14,6 +14,7 @@
 
 #include <memory>
 #include <string>
+#include <typeinfo>
 
 #include "cppdi/injector.h"
 #include "cppdi/provider.h"
