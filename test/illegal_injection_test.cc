@@ -19,10 +19,14 @@ class I {
 
 };
 
+class B : public I {
+
+};
+
 TEST(illegal_injection_test, missing_binding) {
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
 
   });
 
@@ -30,4 +34,22 @@ TEST(illegal_injection_test, missing_binding) {
   EXPECT_THROW(injector->GetInstance<I>(), InjectionError);
   EXPECT_THROW(injector->GetInstance<shared_ptr<I>>(), InjectionError);
   EXPECT_THROW(injector->GetInstance<shared_ptr<Provider<shared_ptr<I>>>>(), InjectionError);
+}
+
+TEST(illegal_injection_test, injection_after_disposal) {
+  cppdi::InjectorFactory factory;
+
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
+    binder->BindInstance<int>(10);
+    binder->BindConstructor<B>();
+    binder->BindTypes<I, B>();
+  });
+
+  shared_ptr<Provider<shared_ptr<I>>> b_provider = injector
+      ->GetInstance<shared_ptr<Provider<shared_ptr<I>>>>();
+
+  injector->Dispose();
+
+  EXPECT_THROW(injector->GetInstance<int>(), InjectionError);
+  EXPECT_THROW(b_provider->Get(), InjectionError);
 }
