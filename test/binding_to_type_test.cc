@@ -56,6 +56,7 @@ TEST(binding_to_type, simple) {
     binder->BindConstructor<A>();
     binder->BindTypes<IA, A>();
   });
+  DisposeGuard guard(injector);
 
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<A>>());
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<IA>>());
@@ -71,6 +72,7 @@ TEST(binding_to_type, multi_inheritance) {
     binder->BindTypes<IX, XY>();
     binder->BindTypes<IY, XY>();
   });
+  DisposeGuard guard(injector);
 
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<XY>>());
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<IX>>());
@@ -90,6 +92,7 @@ TEST(binding_to_type, complex) {
     binder->BindConstructor<B, shared_ptr<IA>>();
     binder->BindTypes<IB, B>();
   });
+  DisposeGuard guard(injector);
 
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<B>>());
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<IB>>());

@@ -29,6 +29,7 @@ TEST(illegal_injection_test, missing_binding) {
   shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
 
   });
+  DisposeGuard guard(injector);
 
   EXPECT_THROW(injector->GetInstance<int>(), InjectionError);
   EXPECT_THROW(injector->GetInstance<I>(), InjectionError);
@@ -44,6 +45,7 @@ TEST(illegal_injection_test, injection_after_disposal) {
     binder->BindConstructor<B>();
     binder->BindTypes<I, B>();
   });
+  DisposeGuard guard(injector);
 
   shared_ptr<Provider<shared_ptr<I>>> b_provider = injector
       ->GetInstance<shared_ptr<Provider<shared_ptr<I>>>>();

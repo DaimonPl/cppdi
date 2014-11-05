@@ -39,6 +39,7 @@ TEST(binding_to_constructor, no_argument) {
   shared_ptr<Injector> injector = factory.Create([](Binder *binder){
     binder->BindConstructor<A>();
   });
+  DisposeGuard guard(injector);
 
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<A>>());
   EXPECT_EQ(injector->GetInstance<shared_ptr<A>>(), injector->GetInstance<shared_ptr<A>>());
@@ -52,6 +53,7 @@ TEST(binding_to_constructor, with_primitive_argument) {
     binder->BindConstructor<B, int>();
     binder->BindInstance<int>(15);
   });
+  DisposeGuard guard(injector);
 
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<B>>());
   EXPECT_EQ(injector->GetInstance<shared_ptr<B>>(), injector->GetInstance<shared_ptr<B>>());
@@ -66,6 +68,7 @@ TEST(binding_to_constructor, with_type_argument) {
     binder->BindConstructor<A>();
     binder->BindConstructor<C, shared_ptr<A>>();
   });
+  DisposeGuard guard(injector);
 
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<C>>());
   EXPECT_EQ(injector->GetInstance<shared_ptr<C>>(), injector->GetInstance<shared_ptr<C>>());

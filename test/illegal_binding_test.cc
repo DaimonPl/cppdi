@@ -37,7 +37,7 @@ TEST(illegal_binding_test, instances) {
   cppdi::InjectorFactory factory;
 
   EXPECT_THROW(
-    shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+    factory.Create([](Binder *binder){
       binder->BindInstance<int>(6);
       binder->BindInstance<int>(7);
     });
@@ -48,7 +48,7 @@ TEST(illegal_binding_test, constructors) {
   cppdi::InjectorFactory factory;
 
   EXPECT_THROW(
-    shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+    factory.Create([](Binder *binder){
       binder->BindConstructor<MultiConstructor>();
       binder->BindConstructor<MultiConstructor, int>();
     });
@@ -59,7 +59,7 @@ TEST(illegal_binding_test, types) {
   cppdi::InjectorFactory factory;
 
   EXPECT_THROW(
-    shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+    factory.Create([](Binder *binder){
       binder->BindConstructor<A>();
       binder->BindConstructor<B>();
       binder->BindTypes<I, A>();

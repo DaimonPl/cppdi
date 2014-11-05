@@ -40,6 +40,7 @@ TEST(binding_to_provider, primitive) {
   shared_ptr<Injector> injector = factory.Create([](Binder *binder){
     binder->BindProvider<int, IntP>();
   });
+  DisposeGuard guard(injector);
 
   EXPECT_EQ(7, injector->GetInstance<int>());
   EXPECT_EQ(7, injector->GetInstance<shared_ptr<Provider<int>>>()->Get());
@@ -51,6 +52,7 @@ TEST(binding_to_provider, type) {
   shared_ptr<Injector> injector = factory.Create([](Binder *binder){
     binder->BindProvider<shared_ptr<IA>, IaP>();
   });
+  DisposeGuard guard(injector);
 
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<IA>>());
   EXPECT_FALSE(!injector->GetInstance<shared_ptr<Provider<shared_ptr<IA>>>>()->Get());

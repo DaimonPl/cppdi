@@ -22,6 +22,7 @@ TEST(binding_to_instance, primitives) {
     binder->BindInstance<int>(5);
     binder->BindInstance<long>(100);
   });
+  DisposeGuard guard(injector);
 
   EXPECT_EQ(5, injector->GetInstance<int>());
   EXPECT_EQ(100, injector->GetInstance<long>());
@@ -36,6 +37,7 @@ TEST(binding_to_instance, strings) {
   shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
     binder->BindInstance<string>(string("xyz"));
   });
+  DisposeGuard guard(injector);
 
   EXPECT_EQ(string("xyz"), injector->GetInstance<string>());
   EXPECT_EQ(string("xyz"), injector->GetInstance<shared_ptr<Provider<string>>>()->Get());
@@ -51,6 +53,7 @@ TEST(binding_to_instance, pointers) {
     binder->BindInstance<int*>(&a);
     binder->BindInstance<long*>(&b);
   });
+  DisposeGuard guard(injector);
 
   EXPECT_EQ(&a, injector->GetInstance<int*>());
   EXPECT_EQ(&b, injector->GetInstance<long*>());
