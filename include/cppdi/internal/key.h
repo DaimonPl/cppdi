@@ -41,10 +41,10 @@ class Key {
   }
 
   const std::string GetFullName() const {
-    std::string fullName(std::string("Key{") + type_.name());
+    std::string fullName(std::string("Key{type: ") + type_.name());
 
     if (!name_.empty()) {
-      fullName += ',' + name_;
+      fullName += ", name: " + name_;
     }
 
     fullName += '}';
