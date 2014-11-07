@@ -12,6 +12,7 @@
 #ifndef CPPDI_BINDER_H_
 #define CPPDI_BINDER_H_
 
+#include <functional>
 #include <string>
 #include <unordered_map>
 
@@ -121,11 +122,36 @@ class Binder {
   template<typename T, typename P>
   void BindProvider(const std::string &name);
 
+  /**
+   * Creates binding between T and producing_fun. Provider function will be
+   * called each time injection of T is requested. Singleton behavior is up to
+   * internal function implementation.
+   *
+   * In case function has arguments, they'll be obtained directly from injector
+   * and passed to function during invocation.
+   *
+   * Types bound by this method can be injected as:
+   *  - T
+   *  - shared_ptr<Provider<T>>
+   *
+   * @throw BindingError if binding for T already exist
+   */
+  template<typename T, typename ...Args>
+  void BindFunction(const std::function<T(Args...)> &producing_func);
+
+  /**
+   * Has same behavior as BindFunction<T, Args...>() but creates named binding
+   * of T.
+   */
+  template<typename T, typename ...Args>
+  void BindFunction(const std::function<T(Args...)> &producing_func, const std::string &name);
+
   // ensure binder is not passed by value
   Binder(const Binder &) = delete;
   Binder(Binder &&) = delete;
   void operator=(const Binder &) = delete;
   void operator=(Binder &&) = delete;
+
  private:
   Binder() {};
 

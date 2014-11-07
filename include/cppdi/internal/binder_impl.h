@@ -20,6 +20,7 @@
 #include "cppdi/binder.h"
 #include "cppdi/errors.h"
 #include "cppdi/internal/concrete_provider_wrapper.h"
+#include "cppdi/internal/function_provider.h"
 #include "cppdi/internal/instance_provider.h"
 #include "cppdi/internal/linking_provider.h"
 #include "cppdi/internal/producing_provider.h"
@@ -116,6 +117,32 @@ void Binder::BindProvider(const std::string &name) {
   internal::Key provider_of_provider_key(typeid(std::shared_ptr<Provider<T>>), name);
   std::shared_ptr<Provider<internal::Any>> provider_of_provider(
       new internal::InstanceProvider(internal::Any(provider)));
+
+  CreateBinding(provider_of_provider_key, provider_of_provider);
+}
+
+template<typename T, typename ...Args>
+void Binder::BindFunction(const std::function<T(Args...)> &producing_func) {
+  BindFunction<T, Args...>(producing_func, std::string());
+}
+
+template<typename T, typename ...Args>
+void Binder::BindFunction(const std::function<T(Args...)> &producing_func,
+                          const std::string &name) {
+  internal::Key key(typeid(T), name);
+
+  std::shared_ptr<Provider<internal::Any>> provider(
+      new internal::FunctionProvider<T, Args...>(producing_func));
+
+  CreateBinding(key, provider);
+
+  //provider binding
+  internal::Key provider_of_provider_key(typeid(std::shared_ptr<Provider<T>>),
+                                         name);
+  std::shared_ptr<Provider<T>> concrete_provider(
+      new internal::RawProviderWrapper<T>(provider));
+  std::shared_ptr<Provider<internal::Any>> provider_of_provider(
+      new internal::InstanceProvider(internal::Any(concrete_provider)));
 
   CreateBinding(provider_of_provider_key, provider_of_provider);
 }

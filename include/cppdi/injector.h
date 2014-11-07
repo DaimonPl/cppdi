@@ -94,6 +94,7 @@ class Injector : public std::enable_shared_from_this<Injector> {
 #include "cppdi/internal/injector_impl.h"
 
 //  moved here due to file dependency
+#include "cppdi/internal/function_provider_impl.h"
 #include "cppdi/internal/linking_provider_impl.h"
 #include "cppdi/internal/producing_provider_impl.h"
 
