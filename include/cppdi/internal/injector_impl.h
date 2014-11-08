@@ -29,10 +29,6 @@ inline Injector::Injector(const Binder &binder) {
   state_ = UNINITIALIZED;
 }
 
-inline internal::Any Injector::GetInstanceByKey(const internal::Key &key) {
-  return GetProvider(key)->Get();
-}
-
 inline void Injector::AutoInitialize() {
   if (state_ == UNINITIALIZED) {
     state_ = INITIALIZED;
@@ -71,7 +67,7 @@ template<typename T>
 T Injector::GetInstance(const std::string &name) {
   internal::Key key(typeid(T), name);
 
-  internal::Any instance = GetInstanceByKey(key);
+  internal::Any instance = GetProvider(key)->Get();;
 
   return instance.as<T>();
 }

@@ -79,7 +79,6 @@ class Injector : public std::enable_shared_from_this<Injector> {
   };
 
   explicit Injector(const Binder &binder);
-  internal::Any GetInstanceByKey(const internal::Key &key);
   std::shared_ptr<Provider<internal::Any>> GetProvider(const internal::Key &key);
   void AutoInitialize();
 
