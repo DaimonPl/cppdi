@@ -35,30 +35,14 @@ struct Any {
     return !ptr;
   }
 
-  bool not_null() const {
-    return ptr;
-  }
-
   template<typename U> Any(U&& value)
       : ptr(new Derived<StorageType<U>>(std::forward<U>(value))) {}
-
-  template<class U> bool is() const {
-    typedef StorageType<U> T;
-
-    auto derived = dynamic_cast<Derived<T>*>(ptr);
-
-    return derived;
-  }
 
   template<class U>
   StorageType<U>& as() {
     typedef StorageType<U> T;
 
-    auto derived = dynamic_cast<Derived<T>*>(ptr);
-
-    if (!derived) {
-      throw std::bad_cast();
-    }
+    auto derived = static_cast<Derived<T>*>(ptr);
 
     return derived->value;
   }
