@@ -36,15 +36,7 @@ void Binder::BindConstructor() {
       new internal::ProducingProvider<T, Args...>());
 
   CreateBinding(key, provider);
-
-  //provider binding
-  internal::Key provider_of_provider_key(
-      typeid(std::shared_ptr<Provider<std::shared_ptr<T>>>));
-  std::shared_ptr<Provider<std::shared_ptr<T>>> concrete_provider(new internal::RawProviderWrapper<std::shared_ptr<T>>(provider));
-  std::shared_ptr<Provider<internal::Any>> provider_of_provider(
-      new internal::InstanceProvider(internal::Any(concrete_provider)));
-
-  CreateBinding(provider_of_provider_key, provider_of_provider);
+  CreateProviderBinding<std::shared_ptr<T>>(std::string(), provider);
 }
 
 template<typename F, typename T>
@@ -63,15 +55,7 @@ void Binder::BindTypes(const std::string &name) {
       new internal::LinkingProvider<F, T>());
 
   CreateBinding(source_key, provider);
-
-  //bind provider
-  internal::Key provider_of_provider_key(
-      typeid(std::shared_ptr<Provider<std::shared_ptr<F>>>), name);
-  std::shared_ptr<Provider<std::shared_ptr<F>>> concrete_provider(new internal::RawProviderWrapper<std::shared_ptr<F>>(provider));
-  std::shared_ptr<Provider<internal::Any>> provider_of_provider(
-      new internal::InstanceProvider(internal::Any(concrete_provider)));
-
-  CreateBinding(provider_of_provider_key, provider_of_provider);
+  CreateProviderBinding<std::shared_ptr<F>>(name, provider);
 }
 
 template<typename T>
@@ -85,16 +69,9 @@ void Binder::BindInstance(const T &instance, const std::string &name) {
 
   std::shared_ptr<Provider<internal::Any>> provider(
       new internal::InstanceProvider(internal::Any(instance)));
+
   CreateBinding(key, provider);
-
-  //provider binding
-  internal::Key provider_of_provider_key(typeid(std::shared_ptr<Provider<T>>), name);
-  std::shared_ptr<Provider<T>> concrete_provider(
-      new internal::RawProviderWrapper<T>(provider));
-  std::shared_ptr<Provider<internal::Any>> provider_of_provider(
-      new internal::InstanceProvider(internal::Any(concrete_provider)));
-
-  CreateBinding(provider_of_provider_key, provider_of_provider);
+  CreateProviderBinding<T>(name, provider);
 }
 
 template<typename T, typename P>
@@ -112,13 +89,7 @@ void Binder::BindProvider(const std::string &name) {
       new internal::ConcreteProviderWrapper<T>(provider));
 
   CreateBinding(key, any_provider);
-
-  //bind provider
-  internal::Key provider_of_provider_key(typeid(std::shared_ptr<Provider<T>>), name);
-  std::shared_ptr<Provider<internal::Any>> provider_of_provider(
-      new internal::InstanceProvider(internal::Any(provider)));
-
-  CreateBinding(provider_of_provider_key, provider_of_provider);
+  CreateProviderBinding<T>(name, any_provider);
 }
 
 template<typename T, typename ...Args>
@@ -135,16 +106,7 @@ void Binder::BindFunction(const std::function<T(Args...)> &producing_func,
       new internal::FunctionProvider<T, Args...>(producing_func));
 
   CreateBinding(key, provider);
-
-  //provider binding
-  internal::Key provider_of_provider_key(typeid(std::shared_ptr<Provider<T>>),
-                                         name);
-  std::shared_ptr<Provider<T>> concrete_provider(
-      new internal::RawProviderWrapper<T>(provider));
-  std::shared_ptr<Provider<internal::Any>> provider_of_provider(
-      new internal::InstanceProvider(internal::Any(concrete_provider)));
-
-  CreateBinding(provider_of_provider_key, provider_of_provider);
+  CreateProviderBinding<T>(name, provider);
 }
 
 inline void Binder::CreateBinding(
@@ -153,6 +115,20 @@ inline void Binder::CreateBinding(
   AssertBindingNotExists(key);
 
   provider_map_.emplace(key, provider);
+}
+
+template<typename T>
+void Binder::CreateProviderBinding(
+    const std::string &name,
+    const std::shared_ptr<Provider<internal::Any>> &provider) {
+  internal::Key provider_key(typeid(std::shared_ptr<Provider<T>>), name);
+
+  std::shared_ptr<Provider<T>> concrete_provider(
+      new internal::RawProviderWrapper<T>(provider));
+  std::shared_ptr<Provider<internal::Any>> provider_of_provider(
+      new internal::InstanceProvider(internal::Any(concrete_provider)));
+
+  CreateBinding(provider_key, provider_of_provider);
 }
 
 inline void Binder::AssertBindingNotExists(const internal::Key &key) {
