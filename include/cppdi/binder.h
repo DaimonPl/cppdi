@@ -35,6 +35,7 @@ class InjectorFactory;
  *  - Type -> ConcreteType (ConcreteType must derive from Type)
  *  - Type -> instance
  *  - Type -> Provider<Type>
+ *  - Type -> std::function (function must return T)
  *
  *  Additionally named bindings are supported. Named bindings allow to define
  *  several bindings for same type for exemple:
@@ -61,6 +62,13 @@ class Binder {
    */
   template<typename T, typename ... Args>
   void BindConstructor();
+
+  /**
+   * Has same behavior as BindConstructor<T, Args>() but creates named binding
+   * of t.
+   */
+  template<typename T, typename ... Args>
+  void BindConstructor(const std::string &name);
 
   /**
    * Creates shared_ptr<F> -> shared_ptr<T> binding - T must derive from F.

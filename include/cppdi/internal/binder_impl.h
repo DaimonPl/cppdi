@@ -29,14 +29,19 @@
 namespace cppdi {
 
 template<typename T, typename ... Args>
-void Binder::BindConstructor() {
-  internal::Key key(typeid(std::shared_ptr<T>));
+void Binder::BindConstructor(const std::string &name) {
+  internal::Key key(typeid(std::shared_ptr<T>), name);
 
   std::shared_ptr<Provider<internal::Any>> provider(
       new internal::ProducingProvider<T, Args...>());
 
   CreateBinding(key, provider);
-  CreateProviderBinding<std::shared_ptr<T>>(std::string(), provider);
+  CreateProviderBinding<std::shared_ptr<T>>(name, provider);
+}
+
+template<typename T, typename ... Args>
+void Binder::BindConstructor() {
+  BindConstructor<T, Args...>(std::string());
 }
 
 template<typename F, typename T>
