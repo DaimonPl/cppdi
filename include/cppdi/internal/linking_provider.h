@@ -23,11 +23,13 @@ namespace internal {
 template<typename F, typename T>
 class LinkingProvider : public Provider<Any> {
  public:
+  explicit LinkingProvider(const std::string &t_name);
   Any Get() override;
 
  private:
   void Initialize(const std::shared_ptr<cppdi::Injector> &injector) override;
 
+  std::string t_name_;
   std::shared_ptr<cppdi::Injector> injector_;
 };
 

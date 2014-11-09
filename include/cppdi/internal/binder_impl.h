@@ -46,21 +46,21 @@ void Binder::BindConstructor() {
 
 template<typename F, typename T>
 void Binder::BindTypes() {
-  BindTypes<F, T>(std::string());
+  BindTypes<F, T>(std::string(), std::string());
 }
 
 template<typename F, typename T>
-void Binder::BindTypes(const std::string &name) {
+void Binder::BindTypes(const std::string &f_name, const std::string &t_name) {
   static_assert(std::is_base_of<F, T>::value, "BindTypes<F, T>() - T must be a descendant of F");
   static_assert(!std::is_same<F, T>::value, "BindTypes<F, T>() - T cannot be same as F");
 
-  internal::Key source_key(typeid(std::shared_ptr<F>), name);
+  internal::Key source_key(typeid(std::shared_ptr<F>), f_name);
 
   std::shared_ptr<Provider<internal::Any>> provider(
-      new internal::LinkingProvider<F, T>());
+      new internal::LinkingProvider<F, T>(t_name));
 
   CreateBinding(source_key, provider);
-  CreateProviderBinding<std::shared_ptr<F>>(name, provider);
+  CreateProviderBinding<std::shared_ptr<F>>(f_name, provider);
 }
 
 template<typename T>

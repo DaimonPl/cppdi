@@ -86,10 +86,11 @@ class Binder {
   void BindTypes();
 
   /**
-   * Has same behavior as BindTypes<F, T>() but creates named binding of F.
+   * Has same behavior as BindTypes<F, T>() but creates named binding of F to
+   * named binding of T.
    */
   template<typename F, typename T>
-  void BindTypes(const std::string &name);
+  void BindTypes(const std::string &f_name, const std::string &t_name);
 
   /**
    * Creates T -> instance binding

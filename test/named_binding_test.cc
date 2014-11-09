@@ -54,12 +54,12 @@ TEST(named_binding, constructor) {
   shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
     binder->BindConstructor<A>();
     binder->BindConstructor<B>();
-    binder->BindConstructor<B, shared_ptr<A>>("a_with_argument");
+    binder->BindConstructor<B, shared_ptr<A>>("with_argument");
   });
   DisposeGuard guard(injector);
 
   shared_ptr<B> normal_b = injector->GetInstance<shared_ptr<B>>();
-  shared_ptr<B> named_b = injector->GetInstance<shared_ptr<B>>("a_with_argument");
+  shared_ptr<B> named_b = injector->GetInstance<shared_ptr<B>>("with_argument");
 
   EXPECT_FALSE(!normal_b);
   EXPECT_FALSE(!named_b);
@@ -69,5 +69,5 @@ TEST(named_binding, constructor) {
   EXPECT_FALSE(!named_b->a_);
 
   EXPECT_EQ(normal_b, injector->GetInstance<shared_ptr<Provider<shared_ptr<B>>>>()->Get());
-  EXPECT_EQ(named_b, injector->GetInstance<shared_ptr<Provider<shared_ptr<B>>>>("a_with_argument")->Get());
+  EXPECT_EQ(named_b, injector->GetInstance<shared_ptr<Provider<shared_ptr<B>>>>("with_argument")->Get());
 }

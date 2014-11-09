@@ -20,8 +20,14 @@ namespace cppdi {
 namespace internal {
 
 template<typename F, typename T>
+LinkingProvider<F, T>::LinkingProvider(const std::string &t_name) {
+  t_name_ = t_name;
+}
+
+template<typename F, typename T>
 Any LinkingProvider<F, T>::Get() {
-  std::shared_ptr<T> instance = injector_->GetInstance<std::shared_ptr<T>>();
+  std::shared_ptr<T> instance = injector_->GetInstance<std::shared_ptr<T>>(
+      t_name_);
 
   return Any(std::static_pointer_cast<F>(instance));
 }
