@@ -13,6 +13,7 @@
 #define CPPDI_ERRORS_H_
 
 #include <string>
+#include <exception>
 
 namespace cppdi {
 
@@ -20,36 +21,36 @@ namespace cppdi {
  * Base error type from cppdi.
  *
  * cppdi errors should not be handled manually - they indicate bugs in program
- * setup / logic
+ * setup / logic.
  */
-struct Error {
+class Error : public std::exception {
+ public:
   /**
-   * Information about error reason
+   * Returns reason message
    */
-  std::string message;
+  const char* what() const noexcept override {
+    return message.c_str();
+  }
 
  protected:
-  explicit Error(const std::string &msg)
-      : message(msg) {
-  }
+  explicit Error(const std::string &msg) : message(msg) {}
+
+ private:
+  std::string message;
 };
 
 /**
  * Error during injection phase.
  */
 struct InjectionError : public Error {
-  explicit InjectionError(const std::string &msg)
-      : Error(msg) {
-  }
+  explicit InjectionError(const std::string &msg) : Error(msg) {}
 };
 
 /**
  * Error during binding phase.
  */
 struct BindingError : public Error {
-  explicit BindingError(const std::string &msg)
-      : Error(msg) {
-  }
+  explicit BindingError(const std::string &msg) : Error(msg) {}
 };
 
 }  // namespace cppdi
