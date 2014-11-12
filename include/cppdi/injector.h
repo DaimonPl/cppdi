@@ -78,7 +78,7 @@ class Injector : public std::enable_shared_from_this<Injector> {
   };
 
   explicit Injector(std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::Any>>> &&providers);
-  std::shared_ptr<Provider<internal::Any>> GetProvider(const internal::Key &key);
+  std::shared_ptr<Provider<internal::Any>> &GetProvider(const internal::Key &key);
   void AutoInitialize();
 
   State state_;

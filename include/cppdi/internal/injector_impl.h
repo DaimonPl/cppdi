@@ -42,7 +42,7 @@ inline void Injector::AutoInitialize() {
   }
 }
 
-inline std::shared_ptr<Provider<internal::Any>> Injector::GetProvider(
+inline std::shared_ptr<Provider<internal::Any>> &Injector::GetProvider(
     const internal::Key &key) {
   if (state_ == DISPOSED) {
     throw InjectionError("Injector has been disposed!");
@@ -68,9 +68,7 @@ template<typename T>
 T Injector::GetInstance(const std::string &name) {
   internal::Key key(typeid(T), name);
 
-  internal::Any instance = GetProvider(key)->Get();;
-
-  return instance.as<T>();
+  return GetProvider(key)->Get().as<T>();
 }
 
 inline void Injector::Dispose() {
