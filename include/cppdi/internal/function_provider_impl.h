@@ -13,6 +13,7 @@
 #define CPPDI_INTERNAL_FUNCTION_PROVIDER_IMPL_H_
 
 #include "cppdi/internal/any.h"
+#include "cppdi/internal/function_provider.h"
 
 namespace cppdi {
 namespace internal {

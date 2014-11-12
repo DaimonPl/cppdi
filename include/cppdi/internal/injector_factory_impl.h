@@ -13,6 +13,7 @@
 #define CPPDI_INTERNAL_INJECTOR_FACTORY_IMPL_H_
 
 #include <memory>
+#include <utility>
 
 #include "cppdi/injector_factory.h"
 #include "cppdi/binder.h"
@@ -31,7 +32,7 @@ inline std::shared_ptr<Injector> InjectorFactory::Create(
     module->Configure(&binder);
   }
 
-  return std::shared_ptr<Injector>(new Injector(binder));
+  return std::shared_ptr<Injector>(new Injector(std::move(binder.provider_map_)));
 }
 
 inline std::shared_ptr<Injector> InjectorFactory::Create(
@@ -40,7 +41,7 @@ inline std::shared_ptr<Injector> InjectorFactory::Create(
 
   binding_function(&binder);
 
-  return std::shared_ptr<Injector>(new Injector(binder));
+  return std::shared_ptr<Injector>(new Injector(std::move(binder.provider_map_)));
 }
 
 }  // namespace cppdi

@@ -23,7 +23,6 @@
 
 namespace cppdi {
 
-class Injector;
 class InjectorFactory;
 
 /**
@@ -164,16 +163,13 @@ class Binder {
  private:
   Binder() {};
 
-  const std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::Any>>>&GetProviderBindings() const;
   void AssertBindingNotExists(const internal::Key &key);
-
   template<typename T>
   void CreateProviderBinding(const std::string &name, const std::shared_ptr<Provider<internal::Any>> &provider);
   void CreateBinding(const internal::Key &key, const std::shared_ptr<Provider<internal::Any>> &provider);
 
   std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::Any>>> provider_map_;
 
-  friend Injector;
   friend InjectorFactory;
 };
 

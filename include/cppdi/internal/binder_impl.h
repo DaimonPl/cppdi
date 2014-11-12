@@ -143,11 +143,6 @@ inline void Binder::AssertBindingNotExists(const internal::Key &key) {
   }
 }
 
-inline const std::unordered_map<internal::Key,
-    std::shared_ptr<Provider<internal::Any>>>&Binder::GetProviderBindings() const {
-  return provider_map_;
-}
-
 }
   // namespace cppdi
 

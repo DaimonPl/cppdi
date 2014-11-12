@@ -16,7 +16,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "cppdi/binder.h"
 #include "cppdi/errors.h"
 #include "cppdi/provider.h"
 #include "cppdi/internal/any.h"
@@ -78,7 +77,7 @@ class Injector : public std::enable_shared_from_this<Injector> {
     DISPOSED
   };
 
-  explicit Injector(const Binder &binder);
+  explicit Injector(std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::Any>>> &&providers);
   std::shared_ptr<Provider<internal::Any>> GetProvider(const internal::Key &key);
   void AutoInitialize();
 

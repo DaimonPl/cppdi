@@ -15,6 +15,7 @@
 #include <memory>
 #include <string>
 #include <typeinfo>
+#include <utility>
 
 #include "cppdi/injector.h"
 #include "cppdi/provider.h"
@@ -24,8 +25,8 @@
 
 namespace cppdi {
 
-inline Injector::Injector(const Binder &binder) {
-  provider_map_ = binder.GetProviderBindings();
+inline Injector::Injector(std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::Any>>> &&providers) {
+  provider_map_ = std::move(providers);
   state_ = UNINITIALIZED;
 }
 
