@@ -23,9 +23,7 @@ namespace internal {
 template<typename T, typename... Args>
 Any ProducingProvider<T, Args...>::Get() {
   if (instance_.is_null()) {
-    T *t = new T(injector_->GetInstance<Args>()...);
-
-    instance_ = Any(std::shared_ptr<T>(t));
+    instance_ = Any(std::make_shared<T>(injector_->GetInstance<Args>()...));
 
     // instance was created, pointer to injector can be removed
     injector_.reset();
