@@ -2,4 +2,5 @@
 .cproject
 .settings
 /test/Debug
+/test/Release
 /doxygen/docs
