@@ -12,48 +12,32 @@
 #include "gtest/gtest.h"
 #include "cppdi/cppdi.h"
 
+#include "tested_types.h"
+
 using namespace cppdi;
 using namespace std;
 
-class IA {
-
-};
-
-class IaP : public Provider<shared_ptr<IA>> {
- public:
-  shared_ptr<IA> Get() override {
-    return shared_ptr<IA>(new IA());
-  }
-};
-
-class IntP : public Provider<int> {
- public:
-  int Get() override {
-    return 7;
-  }
-};
-
-
 TEST(binding_to_provider, primitive) {
   cppdi::InjectorFactory factory;
+  IntProvider provider;
 
   shared_ptr<Injector> injector = factory.Create([](Binder *binder){
-    binder->BindProvider<int, IntP>();
+    binder->BindProvider<int, IntProvider>();
   });
   DisposeGuard guard(injector);
 
-  EXPECT_EQ(7, injector->GetInstance<int>());
-  EXPECT_EQ(7, injector->GetInstance<shared_ptr<Provider<int>>>()->Get());
+  EXPECT_EQ(provider.Get(), injector->GetInstance<int>());
+  EXPECT_EQ(provider.Get(), injector->GetInstance<shared_ptr<Provider<int>>>()->Get());
 }
 
 TEST(binding_to_provider, type) {
   cppdi::InjectorFactory factory;
 
   shared_ptr<Injector> injector = factory.Create([](Binder *binder){
-    binder->BindProvider<shared_ptr<IA>, IaP>();
+    binder->BindProvider<shared_ptr<Interface>, InterfaceProvider>();
   });
   DisposeGuard guard(injector);
 
-  EXPECT_FALSE(!injector->GetInstance<shared_ptr<IA>>());
-  EXPECT_FALSE(!injector->GetInstance<shared_ptr<Provider<shared_ptr<IA>>>>()->Get());
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<Interface>>());
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<Provider<shared_ptr<Interface>>>>()->Get());
 }

@@ -12,25 +12,10 @@
 #include "gtest/gtest.h"
 #include "cppdi/cppdi.h"
 
+#include "tested_types.h"
+
 using namespace cppdi;
 using namespace std;
-
-class A {
-
-};
-
-class B {
- public:
-  B() {
-
-  }
-
-  B(shared_ptr<A> a) {
-    a_ = a;
-  }
-
-  shared_ptr<A> a_;
-};
 
 TEST(named_binding, instance) {
   cppdi::InjectorFactory factory;
@@ -52,22 +37,23 @@ TEST(named_binding, constructor) {
   cppdi::InjectorFactory factory;
 
   shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
-    binder->BindConstructor<A>();
-    binder->BindConstructor<B>();
-    binder->BindConstructor<B, shared_ptr<A>>("with_argument");
+    binder->BindConstructor<Implementation>();
+    binder->BindTypes<Interface, Implementation>();
+    binder->BindConstructor<ImplementationWithDependencyAndNonArgCtor>();
+    binder->BindConstructor<ImplementationWithDependencyAndNonArgCtor, shared_ptr<Interface>>("with_argument");
   });
   DisposeGuard guard(injector);
 
-  shared_ptr<B> normal_b = injector->GetInstance<shared_ptr<B>>();
-  shared_ptr<B> named_b = injector->GetInstance<shared_ptr<B>>("with_argument");
+  shared_ptr<ImplementationWithDependencyAndNonArgCtor> normal = injector->GetInstance<shared_ptr<ImplementationWithDependencyAndNonArgCtor>>();
+  shared_ptr<ImplementationWithDependencyAndNonArgCtor> named = injector->GetInstance<shared_ptr<ImplementationWithDependencyAndNonArgCtor>>("with_argument");
 
-  EXPECT_FALSE(!normal_b);
-  EXPECT_FALSE(!named_b);
-  EXPECT_FALSE(normal_b == named_b);
+  EXPECT_FALSE(!normal);
+  EXPECT_FALSE(!named);
+  EXPECT_FALSE(normal == named);
 
-  EXPECT_FALSE(normal_b->a_);
-  EXPECT_FALSE(!named_b->a_);
+  EXPECT_FALSE(normal->intf_);
+  EXPECT_FALSE(!named->intf_);
 
-  EXPECT_EQ(normal_b, injector->GetInstance<shared_ptr<Provider<shared_ptr<B>>>>()->Get());
-  EXPECT_EQ(named_b, injector->GetInstance<shared_ptr<Provider<shared_ptr<B>>>>("with_argument")->Get());
+  EXPECT_EQ(normal, injector->GetInstance<shared_ptr<Provider<shared_ptr<ImplementationWithDependencyAndNonArgCtor>>>>()->Get());
+  EXPECT_EQ(named, injector->GetInstance<shared_ptr<Provider<shared_ptr<ImplementationWithDependencyAndNonArgCtor>>>>("with_argument")->Get());
 }

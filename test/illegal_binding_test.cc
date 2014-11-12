@@ -12,26 +12,10 @@
 #include "gtest/gtest.h"
 #include "cppdi/cppdi.h"
 
+#include "tested_types.h"
+
 using namespace cppdi;
 using namespace std;
-
-class MultiConstructor {
- public:
-  MultiConstructor() {}
-  MultiConstructor(int a) {}
-};
-
-class I {
-
-};
-
-class A : public I {
-
-};
-
-class B : public I {
-
-};
 
 TEST(illegal_binding_test, instances) {
   cppdi::InjectorFactory factory;
@@ -49,8 +33,8 @@ TEST(illegal_binding_test, constructors) {
 
   EXPECT_THROW(
     factory.Create([](Binder *binder){
-      binder->BindConstructor<MultiConstructor>();
-      binder->BindConstructor<MultiConstructor, int>();
+      binder->BindConstructor<IntDependentWithNonArgCtor>();
+      binder->BindConstructor<IntDependentWithNonArgCtor, int>();
     });
   , BindingError);
 }
@@ -60,10 +44,10 @@ TEST(illegal_binding_test, types) {
 
   EXPECT_THROW(
     factory.Create([](Binder *binder){
-      binder->BindConstructor<A>();
-      binder->BindConstructor<B>();
-      binder->BindTypes<I, A>();
-      binder->BindTypes<I, B>();
+      binder->BindConstructor<Implementation>();
+      binder->BindConstructor<ImplementationOfTwoInterfaces>();
+      binder->BindTypes<Interface, Implementation>();
+      binder->BindTypes<Interface, ImplementationOfTwoInterfaces>();
     });
   , BindingError);
 }

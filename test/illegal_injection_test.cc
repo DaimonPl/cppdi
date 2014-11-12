@@ -12,16 +12,10 @@
 #include "gtest/gtest.h"
 #include "cppdi/cppdi.h"
 
+#include "tested_types.h"
+
 using namespace cppdi;
 using namespace std;
-
-class I {
-
-};
-
-class B : public I {
-
-};
 
 TEST(illegal_injection_test, missing_binding) {
   cppdi::InjectorFactory factory;
@@ -32,9 +26,9 @@ TEST(illegal_injection_test, missing_binding) {
   DisposeGuard guard(injector);
 
   EXPECT_THROW(injector->GetInstance<int>(), InjectionError);
-  EXPECT_THROW(injector->GetInstance<I>(), InjectionError);
-  EXPECT_THROW(injector->GetInstance<shared_ptr<I>>(), InjectionError);
-  EXPECT_THROW(injector->GetInstance<shared_ptr<Provider<shared_ptr<I>>>>(), InjectionError);
+  EXPECT_THROW(injector->GetInstance<Interface*>(), InjectionError);
+  EXPECT_THROW(injector->GetInstance<shared_ptr<Interface>>(), InjectionError);
+  EXPECT_THROW(injector->GetInstance<shared_ptr<Provider<shared_ptr<Interface>>>>(), InjectionError);
 }
 
 TEST(illegal_injection_test, injection_after_disposal) {
@@ -42,13 +36,13 @@ TEST(illegal_injection_test, injection_after_disposal) {
 
   shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
     binder->BindInstance<int>(10);
-    binder->BindConstructor<B>();
-    binder->BindTypes<I, B>();
+    binder->BindConstructor<Implementation>();
+    binder->BindTypes<Interface, Implementation>();
   });
   DisposeGuard guard(injector);
 
-  shared_ptr<Provider<shared_ptr<I>>> b_provider = injector
-      ->GetInstance<shared_ptr<Provider<shared_ptr<I>>>>();
+  shared_ptr<Provider<shared_ptr<Interface>>> b_provider = injector
+      ->GetInstance<shared_ptr<Provider<shared_ptr<Interface>>>>();
 
   injector->Dispose();
 

@@ -12,38 +12,32 @@
 #include "gtest/gtest.h"
 #include "cppdi/cppdi.h"
 
+#include "tested_types.h"
+
 using namespace cppdi;
 using namespace std;
-
-int producing_fun() {
-  return 18;
-}
-
-long producing_fun2(int a) {
-  return a + 22;
-}
 
 TEST(binding_to_function, no_argument) {
   cppdi::InjectorFactory factory;
 
   shared_ptr<Injector> injector = factory.Create([=](Binder *binder) {
-    binder->BindFunction<int>(std::function<int()>(producing_fun));
+    binder->BindFunction<int>(std::function<int()>(int_function));
   });
   DisposeGuard guard(injector);
 
-  EXPECT_EQ(18, injector->GetInstance<int>());
-  EXPECT_EQ(18, injector->GetInstance<shared_ptr<Provider<int>>>()->Get());
+  EXPECT_EQ(int_function(), injector->GetInstance<int>());
+  EXPECT_EQ(int_function(), injector->GetInstance<shared_ptr<Provider<int>>>()->Get());
 }
 
 TEST(binding_to_function, with_argument) {
   cppdi::InjectorFactory factory;
 
   shared_ptr<Injector> injector = factory.Create([=](Binder *binder) {
-    binder->BindFunction<int>(std::function<int()>(producing_fun));
-    binder->BindFunction<long>(std::function<long(int)>(producing_fun2));
+    binder->BindFunction<int>(std::function<int()>(int_function));
+    binder->BindFunction<long>(std::function<long(int)>(long_function_with_int_arg));
   });
   DisposeGuard guard(injector);
 
-  EXPECT_EQ(40, injector->GetInstance<long>());
-  EXPECT_EQ(40, injector->GetInstance<shared_ptr<Provider<long>>>()->Get());
+  EXPECT_EQ(long_function_with_int_arg(int_function()), injector->GetInstance<long>());
+  EXPECT_EQ(long_function_with_int_arg(int_function()), injector->GetInstance<shared_ptr<Provider<long>>>()->Get());
 }

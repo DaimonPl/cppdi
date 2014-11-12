@@ -12,94 +12,62 @@
 #include "gtest/gtest.h"
 #include "cppdi/cppdi.h"
 
+#include "tested_types.h"
+
 using namespace cppdi;
 using namespace std;
-
-class IA {
-
-};
-
-class A : public IA {
-
-};
-
-class IB {
-
-};
-
-class B : public IB {
- public:
-  B(shared_ptr<IA> a) {
-    a_ = a;
-  }
-
-
-  shared_ptr<IA> a_;
-};
-
-class IX {
-
-};
-
-class IY {
-
-};
-
-class XY : public IX, public IY {
-
-};
 
 TEST(binding_to_type, simple) {
   cppdi::InjectorFactory factory;
 
   shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
-    binder->BindConstructor<A>();
-    binder->BindTypes<IA, A>();
+    binder->BindConstructor<Implementation>();
+    binder->BindTypes<Interface, Implementation>();
   });
   DisposeGuard guard(injector);
 
-  EXPECT_FALSE(!injector->GetInstance<shared_ptr<A>>());
-  EXPECT_FALSE(!injector->GetInstance<shared_ptr<IA>>());
-  EXPECT_EQ(injector->GetInstance<shared_ptr<A>>(), injector->GetInstance<shared_ptr<IA>>());
-  EXPECT_EQ(injector->GetInstance<shared_ptr<Provider<shared_ptr<A>>>>()->Get(), injector->GetInstance<shared_ptr<Provider<shared_ptr<IA>>>>()->Get());
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<Implementation>>());
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<Interface>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<Implementation>>(), injector->GetInstance<shared_ptr<Interface>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<Provider<shared_ptr<Implementation>>>>()->Get(), injector->GetInstance<shared_ptr<Provider<shared_ptr<Interface>>>>()->Get());
 }
 
 TEST(binding_to_type, multi_inheritance) {
   cppdi::InjectorFactory factory;
 
   shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
-    binder->BindConstructor<XY>();
-    binder->BindTypes<IX, XY>();
-    binder->BindTypes<IY, XY>();
+    binder->BindConstructor<ImplementationOfTwoInterfaces>();
+    binder->BindTypes<Interface, ImplementationOfTwoInterfaces>();
+    binder->BindTypes<Interface2, ImplementationOfTwoInterfaces>();
   });
   DisposeGuard guard(injector);
 
-  EXPECT_FALSE(!injector->GetInstance<shared_ptr<XY>>());
-  EXPECT_FALSE(!injector->GetInstance<shared_ptr<IX>>());
-  EXPECT_FALSE(!injector->GetInstance<shared_ptr<IY>>());
-  EXPECT_EQ(injector->GetInstance<shared_ptr<IX>>(), injector->GetInstance<shared_ptr<XY>>());
-  EXPECT_EQ(injector->GetInstance<shared_ptr<IY>>(), injector->GetInstance<shared_ptr<XY>>());
-  EXPECT_EQ(injector->GetInstance<shared_ptr<Provider<shared_ptr<IX>>>>()->Get(), injector->GetInstance<shared_ptr<Provider<shared_ptr<XY>>>>()->Get());
-  EXPECT_EQ(injector->GetInstance<shared_ptr<Provider<shared_ptr<IY>>>>()->Get(), injector->GetInstance<shared_ptr<Provider<shared_ptr<XY>>>>()->Get());
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<ImplementationOfTwoInterfaces>>());
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<Interface>>());
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<Interface2>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<Interface>>(), injector->GetInstance<shared_ptr<ImplementationOfTwoInterfaces>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<Interface2>>(), injector->GetInstance<shared_ptr<ImplementationOfTwoInterfaces>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<Provider<shared_ptr<Interface>>>>()->Get(), injector->GetInstance<shared_ptr<Provider<shared_ptr<ImplementationOfTwoInterfaces>>>>()->Get());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<Provider<shared_ptr<Interface2>>>>()->Get(), injector->GetInstance<shared_ptr<Provider<shared_ptr<ImplementationOfTwoInterfaces>>>>()->Get());
 }
 
 TEST(binding_to_type, complex) {
   cppdi::InjectorFactory factory;
 
   shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
-    binder->BindConstructor<A>();
-    binder->BindTypes<IA, A>();
-    binder->BindConstructor<B, shared_ptr<IA>>();
-    binder->BindTypes<IB, B>();
+    binder->BindConstructor<Implementation>();
+    binder->BindTypes<Interface, Implementation>();
+    binder->BindConstructor<ImplementationWithDependency, shared_ptr<Interface>>();
+    binder->BindTypes<Interface2, ImplementationWithDependency>();
   });
   DisposeGuard guard(injector);
 
-  EXPECT_FALSE(!injector->GetInstance<shared_ptr<B>>());
-  EXPECT_FALSE(!injector->GetInstance<shared_ptr<IB>>());
-  EXPECT_FALSE(!injector->GetInstance<shared_ptr<A>>());
-  EXPECT_FALSE(!injector->GetInstance<shared_ptr<IA>>());
-  EXPECT_EQ(injector->GetInstance<shared_ptr<A>>(), injector->GetInstance<shared_ptr<IA>>());
-  EXPECT_EQ(injector->GetInstance<shared_ptr<A>>(), injector->GetInstance<shared_ptr<B>>()->a_);
-  EXPECT_EQ(injector->GetInstance<shared_ptr<Provider<shared_ptr<A>>>>()->Get(), injector->GetInstance<shared_ptr<Provider<shared_ptr<IA>>>>()->Get());
-  EXPECT_EQ(injector->GetInstance<shared_ptr<Provider<shared_ptr<B>>>>()->Get(), injector->GetInstance<shared_ptr<Provider<shared_ptr<IB>>>>()->Get());
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<ImplementationWithDependency>>());
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<Interface2>>());
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<Implementation>>());
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<Interface>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<Implementation>>(), injector->GetInstance<shared_ptr<Interface>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<Implementation>>(), injector->GetInstance<shared_ptr<ImplementationWithDependency>>()->intf_);
+  EXPECT_EQ(injector->GetInstance<shared_ptr<Provider<shared_ptr<Implementation>>>>()->Get(), injector->GetInstance<shared_ptr<Provider<shared_ptr<Interface>>>>()->Get());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<Provider<shared_ptr<ImplementationWithDependency>>>>()->Get(), injector->GetInstance<shared_ptr<Provider<shared_ptr<Interface2>>>>()->Get());
 }

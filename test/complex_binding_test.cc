@@ -12,76 +12,28 @@
 #include "gtest/gtest.h"
 #include "cppdi/cppdi.h"
 
+#include "tested_types.h"
+
 using namespace cppdi;
 using namespace std;
-
-class IA {
- public:
-  virtual ~IA() {}
-  virtual void a() = 0;
-};
-
-class IB {
- public:
-  virtual ~IB() {}
-  virtual void b() = 0;
-};
-
-class IC {
- public:
-  virtual ~IC() {}
-  virtual void c() = 0;
-};
-
-class A : public IA {
- public:
-  A(shared_ptr<IB> ib) {
-    ib_ = ib;
-  }
-
-  void a() override {}
-
-  shared_ptr<IB> ib_;
-};
-
-class B : public IB {
- public:
-  B(shared_ptr<IC> ic) {
-    ic_ = ic;
-  }
-
-  void b() override {}
-
-  shared_ptr<IC> ic_;
-};
-
-class C : public IC {
- public:
-  C(shared_ptr<Provider<shared_ptr<IA>>> iap) {
-    iap_ = iap;
-  }
-
-  void c() override {}
-
-  shared_ptr<Provider<shared_ptr<IA>>> iap_;
-};
 
 TEST(complex_binding, cycle) {
   cppdi::InjectorFactory factory;
 
   shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
-    binder->BindConstructor<A, shared_ptr<IB>>();
-    binder->BindConstructor<B, shared_ptr<IC>>();
-    binder->BindConstructor<C, shared_ptr<Provider<shared_ptr<IA>>>>();
-    binder->BindTypes<IA, A>();
-    binder->BindTypes<IB, B>();
-    binder->BindTypes<IC, C>();
+    binder->BindConstructor<CycleImpl1, shared_ptr<CycleIntf2>>();
+    binder->BindConstructor<CycleImpl2, shared_ptr<CycleIntf3>>();
+    binder->BindConstructor<CycleImpl3, shared_ptr<Provider<shared_ptr<CycleIntf1>>>>();
+    binder->BindTypes<CycleIntf1, CycleImpl1>();
+    binder->BindTypes<CycleIntf2, CycleImpl2>();
+    binder->BindTypes<CycleIntf3, CycleImpl3>();
   });
   DisposeGuard guard(injector);
 
-  shared_ptr<IA> ia = injector->GetInstance<shared_ptr<IA>>();
-  shared_ptr<IC> ic = injector->GetInstance<shared_ptr<IC>>();
-  shared_ptr<C> c = static_pointer_cast<C>(ic);
+  shared_ptr<CycleIntf1> if1 = injector->GetInstance<shared_ptr<CycleIntf1>>();
+  shared_ptr<CycleIntf3> if3 = injector->GetInstance<shared_ptr<CycleIntf3>>();
+  shared_ptr<CycleImpl3> impl3 = injector->GetInstance<shared_ptr<CycleImpl3>>();
 
-  EXPECT_EQ(ia, c->iap_->Get());
+  EXPECT_EQ(if3, impl3);
+  EXPECT_EQ(if1, impl3->intf1p_->Get());
 }

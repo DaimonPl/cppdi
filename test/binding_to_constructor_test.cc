@@ -12,66 +12,50 @@
 #include "gtest/gtest.h"
 #include "cppdi/cppdi.h"
 
+#include "tested_types.h"
+
 using namespace cppdi;
 using namespace std;
-
-class A {
-
-};
-
-class B {
-   public:
-    B(int x) {x_ = x;}
-
-    int x_;
-  };
-
-class C {
-   public:
-    C(shared_ptr<A> a) {a_ = a;}
-
-    shared_ptr<A> a_;
-  };
 
 TEST(binding_to_constructor, no_argument) {
   cppdi::InjectorFactory factory;
 
-  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
-    binder->BindConstructor<A>();
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
+    binder->BindConstructor<NoDependency>();
   });
   DisposeGuard guard(injector);
 
-  EXPECT_FALSE(!injector->GetInstance<shared_ptr<A>>());
-  EXPECT_EQ(injector->GetInstance<shared_ptr<A>>(), injector->GetInstance<shared_ptr<A>>());
-  EXPECT_EQ(injector->GetInstance<shared_ptr<A>>(), injector->GetInstance<shared_ptr<Provider<shared_ptr<A>>>>()->Get());
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<NoDependency>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<NoDependency>>(), injector->GetInstance<shared_ptr<NoDependency>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<NoDependency>>(), injector->GetInstance<shared_ptr<Provider<shared_ptr<NoDependency>>>>()->Get());
 }
 
 TEST(binding_to_constructor, with_primitive_argument) {
   cppdi::InjectorFactory factory;
 
   shared_ptr<Injector> injector = factory.Create([](Binder *binder){
-    binder->BindConstructor<B, int>();
+    binder->BindConstructor<IntDependent, int>();
     binder->BindInstance<int>(15);
   });
   DisposeGuard guard(injector);
 
-  EXPECT_FALSE(!injector->GetInstance<shared_ptr<B>>());
-  EXPECT_EQ(injector->GetInstance<shared_ptr<B>>(), injector->GetInstance<shared_ptr<B>>());
-  EXPECT_EQ(injector->GetInstance<shared_ptr<B>>(), injector->GetInstance<shared_ptr<Provider<shared_ptr<B>>>>()->Get());
-  EXPECT_EQ(15, injector->GetInstance<shared_ptr<B>>()->x_);
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<IntDependent>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<IntDependent>>(), injector->GetInstance<shared_ptr<IntDependent>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<IntDependent>>(), injector->GetInstance<shared_ptr<Provider<shared_ptr<IntDependent>>>>()->Get());
+  EXPECT_EQ(15, injector->GetInstance<shared_ptr<IntDependent>>()->x_);
 }
 
 TEST(binding_to_constructor, with_type_argument) {
   cppdi::InjectorFactory factory;
 
   shared_ptr<Injector> injector = factory.Create([](Binder *binder){
-    binder->BindConstructor<A>();
-    binder->BindConstructor<C, shared_ptr<A>>();
+    binder->BindConstructor<NoDependency>();
+    binder->BindConstructor<TypeDependency, shared_ptr<NoDependency>>();
   });
   DisposeGuard guard(injector);
 
-  EXPECT_FALSE(!injector->GetInstance<shared_ptr<C>>());
-  EXPECT_EQ(injector->GetInstance<shared_ptr<C>>(), injector->GetInstance<shared_ptr<C>>());
-  EXPECT_EQ(injector->GetInstance<shared_ptr<C>>(), injector->GetInstance<shared_ptr<Provider<shared_ptr<C>>>>()->Get());
-  EXPECT_EQ(injector->GetInstance<shared_ptr<A>>(), injector->GetInstance<shared_ptr<C>>()->a_);
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<TypeDependency>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<TypeDependency>>(), injector->GetInstance<shared_ptr<TypeDependency>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<TypeDependency>>(), injector->GetInstance<shared_ptr<Provider<shared_ptr<TypeDependency>>>>()->Get());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<NoDependency>>(), injector->GetInstance<shared_ptr<TypeDependency>>()->x_);
 }
