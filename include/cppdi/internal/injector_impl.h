@@ -25,7 +25,7 @@
 
 namespace cppdi {
 
-inline Injector::Injector(std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::Any>>> &&providers) {
+inline Injector::Injector(std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>> &&providers) {
   provider_map_ = std::move(providers);
   state_ = UNINITIALIZED;
 }
@@ -42,7 +42,7 @@ inline void Injector::AutoInitialize() {
   }
 }
 
-inline std::shared_ptr<Provider<internal::Any>> &Injector::GetProvider(
+inline std::shared_ptr<Provider<internal::SharedAny>> &Injector::GetProvider(
     const internal::Key &key) {
   if (state_ == DISPOSED) {
     throw InjectionError("Injector has been disposed!");

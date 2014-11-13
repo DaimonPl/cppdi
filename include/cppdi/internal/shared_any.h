@@ -9,15 +9,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CPPDI_INTERNAL_ANY_H_
-#define CPPDI_INTERNAL_ANY_H_
+#ifndef CPPDI_INTERNAL_SHARED_ANY_H_
+#define CPPDI_INTERNAL_SHARED_ANY_H_
 
 #include <algorithm>
-#include <type_traits>
-#include <utility>
-#include <typeinfo>
+#include <memory>
 #include <string>
-#include <cassert>
+#include <type_traits>
+#include <typeinfo>
+#include <utility>
 
 namespace cppdi {
 namespace internal {
@@ -30,19 +30,21 @@ namespace internal {
 template<class T>
 using StorageType = typename std::decay<T>::type;
 
-struct Any {
+struct SharedAny {
   bool is_null() const {
-    return !ptr;
+    return !sptr;
   }
 
-  template<typename U> Any(U&& value)
-      : ptr(new Derived<StorageType<U>>(std::forward<U>(value))) {}
+  SharedAny() {}
+
+  template<typename U> SharedAny(U&& value)
+      : sptr(std::make_shared<Derived<StorageType<U>>>(std::forward<U>(value))) {}
 
   template<class U>
   StorageType<U>& as() {
     typedef StorageType<U> T;
 
-    auto derived = static_cast<Derived<T>*>(ptr);
+    auto derived = std::static_pointer_cast<Derived<T>>(sptr);
 
     return derived->value;
   }
@@ -52,55 +54,37 @@ struct Any {
     return as<StorageType<U>>();
   }
 
-  Any() : ptr(nullptr) {}
+  SharedAny(SharedAny& that) : sptr(that.sptr) {}
 
-  Any(Any& that) : ptr(that.clone()) {}
+  SharedAny(SharedAny&& that) : sptr(std::move(that.sptr)) {}
 
-  Any(Any&& that) : ptr(that.ptr) {
-    that.ptr = nullptr;
-  }
+  SharedAny(const SharedAny& that) : sptr(that.sptr) {}
 
-  Any(const Any& that) : ptr(that.clone()) {}
+  SharedAny(const SharedAny&& that) : sptr(that.sptr) {}
 
-  Any(const Any&& that) : ptr(that.clone()) {}
-
-  Any& operator=(const Any& a) {
-    if (ptr == a.ptr) {
+  SharedAny& operator=(const SharedAny& a) {
+    if (sptr == a.sptr) {
       return *this;
     }
 
-    auto old_ptr = ptr;
-
-    ptr = a.clone();
-
-    if (old_ptr) {
-      delete old_ptr;
-    }
+    sptr = a.sptr;
 
     return *this;
   }
 
-  Any& operator=(Any&& a) {
-    if (ptr == a.ptr) {
+  SharedAny& operator=(SharedAny&& a) {
+    if (sptr == a.sptr) {
       return *this;
     }
 
-    std::swap(ptr, a.ptr);
+    sptr = std::move(a.sptr);
 
     return *this;
-  }
-
-  ~Any() {
-    if (ptr) {
-      delete ptr;
-    }
   }
 
  private:
   struct Base {
     virtual ~Base() {}
-
-    virtual Base* clone() const = 0;
   };
 
   template<typename T>
@@ -108,24 +92,12 @@ struct Any {
     template<typename U> Derived(U&& value) : value(std::forward<U>(value)) {}
 
     T value;
-
-    Base* clone() const {
-      return new Derived<T>(value);
-    }
   };
 
-  Base* clone() const {
-    if (ptr) {
-      return ptr->clone();
-    } else {
-      return nullptr;
-    }
-  }
-
-  Base* ptr;
+  std::shared_ptr<Base> sptr;
 };
 
 }  // namespace internal
 }  // namespace cppdi
 
-#endif  // CPPDI_INTERNAL_ANY_H_
+#endif  // CPPDI_INTERNAL_SHARED_ANY_H_

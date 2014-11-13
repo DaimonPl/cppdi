@@ -12,7 +12,6 @@
 #ifndef CPPDI_INTERNAL_FUNCTION_PROVIDER_IMPL_H_
 #define CPPDI_INTERNAL_FUNCTION_PROVIDER_IMPL_H_
 
-#include "cppdi/internal/any.h"
 #include "cppdi/internal/function_provider.h"
 
 namespace cppdi {
@@ -25,8 +24,8 @@ FunctionProvider<T, Args...>::FunctionProvider(
 }
 
 template<typename T, typename ...Args>
-Any FunctionProvider<T, Args...>::Get() {
-  return Any(function_(injector_->GetInstance<Args>()...));
+SharedAny FunctionProvider<T, Args...>::Get() {
+  return SharedAny(function_(injector_->GetInstance<Args>()...));
 }
 
 template<typename T, typename ...Args>

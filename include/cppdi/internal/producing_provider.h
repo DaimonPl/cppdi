@@ -23,14 +23,14 @@ class Injector;
 namespace internal {
 
 template<typename T, typename... Args>
-class ProducingProvider : public Provider<Any> {
+class ProducingProvider : public Provider<SharedAny> {
  public:
-  Any Get() override;
+  SharedAny Get() override;
 
  private:
   void Initialize(const std::shared_ptr<cppdi::Injector> &injector) override;
 
-  Any instance_;
+  SharedAny instance_;
   std::shared_ptr<cppdi::Injector> injector_;
 };
 

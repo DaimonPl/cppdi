@@ -14,21 +14,22 @@
 
 #include <memory>
 
-#include "cppdi/internal/any.h"
+#include "cppdi/provider.h"
+#include "cppdi/internal/shared_any.h"
 
 namespace cppdi {
 namespace internal {
 
 template<typename T>
-class ConcreteProviderWrapper : public Provider<Any> {
+class ConcreteProviderWrapper : public Provider<SharedAny> {
  public:
   explicit ConcreteProviderWrapper(
       const std::shared_ptr<Provider<T>> &concrete_provider)
       : concrete_provider_(concrete_provider) {
   }
 
-  Any Get() override {
-    return Any(concrete_provider_->Get());
+  SharedAny Get() override {
+    return SharedAny(concrete_provider_->Get());
   }
  private:
   std::shared_ptr<Provider<T>> concrete_provider_;

@@ -15,16 +15,17 @@
 #include <memory>
 
 #include "cppdi/injector.h"
-#include "cppdi/internal/any.h"
+#include "cppdi/provider.h"
+#include "cppdi/internal/shared_any.h"
 
 namespace cppdi {
 namespace internal {
 
 template<typename F, typename T>
-class LinkingProvider : public Provider<Any> {
+class LinkingProvider : public Provider<SharedAny> {
  public:
   explicit LinkingProvider(const std::string &t_name);
-  Any Get() override;
+  SharedAny Get() override;
 
  private:
   void Initialize(const std::shared_ptr<cppdi::Injector> &injector) override;

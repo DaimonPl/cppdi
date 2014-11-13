@@ -18,8 +18,8 @@
 
 #include "cppdi/errors.h"
 #include "cppdi/provider.h"
-#include "cppdi/internal/any.h"
 #include "cppdi/internal/key.h"
+#include "internal/shared_any.h"
 
 namespace cppdi {
 
@@ -165,10 +165,10 @@ class Binder {
 
   void AssertBindingNotExists(const internal::Key &key);
   template<typename T>
-  void CreateProviderBinding(const std::string &name, const std::shared_ptr<Provider<internal::Any>> &provider);
-  void CreateBinding(const internal::Key &key, const std::shared_ptr<Provider<internal::Any>> &provider);
+  void CreateProviderBinding(const std::string &name, const std::shared_ptr<Provider<internal::SharedAny>> &provider);
+  void CreateBinding(const internal::Key &key, const std::shared_ptr<Provider<internal::SharedAny>> &provider);
 
-  std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::Any>>> provider_map_;
+  std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>> provider_map_;
 
   friend InjectorFactory;
 };

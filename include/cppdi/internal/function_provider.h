@@ -12,17 +12,21 @@
 #ifndef CPPDI_INTERNAL_FUNCTION_PROVIDER_H_
 #define CPPDI_INTERNAL_FUNCTION_PROVIDER_H_
 
-#include "cppdi/internal/any.h"
+#include <functional>
+#include <memory>
+
+#include "cppdi/provider.h"
+#include "cppdi/internal/shared_any.h"
 
 namespace cppdi {
 namespace internal {
 
 template<typename T, typename ...Args>
-class FunctionProvider : public Provider<Any> {
+class FunctionProvider : public Provider<SharedAny> {
  public:
   explicit FunctionProvider(const std::function<T(Args...)> &function);
 
-  Any Get() override;
+  SharedAny Get() override;
  private:
   std::shared_ptr<cppdi::Injector> injector_;
   std::function<T(Args...)> function_;

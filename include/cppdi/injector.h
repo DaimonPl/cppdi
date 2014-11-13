@@ -18,8 +18,8 @@
 
 #include "cppdi/errors.h"
 #include "cppdi/provider.h"
-#include "cppdi/internal/any.h"
 #include "cppdi/internal/key.h"
+#include "internal/shared_any.h"
 
 namespace cppdi {
 
@@ -77,12 +77,12 @@ class Injector : public std::enable_shared_from_this<Injector> {
     DISPOSED
   };
 
-  explicit Injector(std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::Any>>> &&providers);
-  std::shared_ptr<Provider<internal::Any>> &GetProvider(const internal::Key &key);
+  explicit Injector(std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>> &&providers);
+  std::shared_ptr<Provider<internal::SharedAny>> &GetProvider(const internal::Key &key);
   void AutoInitialize();
 
   State state_;
-  std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::Any>>>provider_map_;
+  std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>>provider_map_;
 
   friend InjectorFactory;
 };

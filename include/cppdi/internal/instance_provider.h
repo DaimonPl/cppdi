@@ -12,22 +12,23 @@
 #ifndef CPPDI_INTERNAL_INSTANCE_PROVIDER_H_
 #define CPPDI_INTERNAL_INSTANCE_PROVIDER_H_
 
-#include "cppdi/internal/any.h"
+#include "cppdi/provider.h"
+#include "cppdi/internal/shared_any.h"
 
 namespace cppdi {
 namespace internal {
 
-class InstanceProvider : public Provider<Any> {
+class InstanceProvider : public Provider<SharedAny> {
  public:
-  explicit InstanceProvider(const Any &instance)
+  explicit InstanceProvider(const SharedAny &instance)
       : instance_(instance) {
   }
 
-  Any Get() override {
+  SharedAny Get() override {
     return instance_;
   }
  private:
-  Any instance_;
+  SharedAny instance_;
 };
 
 }  // namespace internal
