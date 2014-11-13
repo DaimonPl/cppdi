@@ -47,6 +47,15 @@ struct InjectionError : public Error {
 };
 
 /**
+ * Error caused by cycle during injection.
+ *
+ * It's thrown only during debug mode (see InjectorFactory::InjectorFactory(bool)
+ */
+struct InjectionCycleError : public InjectionError {
+  explicit InjectionCycleError(const std::string &msg) : InjectionError(msg) {}
+};
+
+/**
  * Error during binding phase.
  */
 struct BindingError : public Error {

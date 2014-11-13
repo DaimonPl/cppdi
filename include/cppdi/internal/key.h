@@ -60,6 +60,14 @@ class Key {
     return !operator==(other);
   }
 
+  bool operator<(const Key& other) const {
+    if (type_ == other.type_) {
+      return name_ < other.name_;
+    }
+
+    return type_ < other.type_;
+  }
+
  private:
   std::type_index type_;
   std::string name_;

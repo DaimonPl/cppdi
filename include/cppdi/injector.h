@@ -18,8 +18,9 @@
 
 #include "cppdi/errors.h"
 #include "cppdi/provider.h"
+#include "cppdi/internal/cycle_verifier.h"
 #include "cppdi/internal/key.h"
-#include "internal/shared_any.h"
+#include "cppdi/internal/shared_any.h"
 
 namespace cppdi {
 
@@ -77,12 +78,16 @@ class Injector : public std::enable_shared_from_this<Injector> {
     DISPOSED
   };
 
-  explicit Injector(std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>> &&providers);
+  explicit Injector(bool debug,
+      std::unordered_map<internal::Key,
+          std::shared_ptr<Provider<internal::SharedAny>>>&&providers);
   std::shared_ptr<Provider<internal::SharedAny>> &GetProvider(const internal::Key &key);
   void AutoInitialize();
 
   State state_;
   std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>>provider_map_;
+  bool debug_;
+  internal::CycleVerifier cycle_verifier_;
 
   friend InjectorFactory;
 };

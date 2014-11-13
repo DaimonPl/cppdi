@@ -99,6 +99,26 @@ struct IntProvider : public cppdi::Provider<int> {
   }
 };
 
+struct SelfCyclic {
+  SelfCyclic(std::shared_ptr<SelfCyclic> x) {}
+};
+
+struct IfCycleA {};
+struct IfCycleB {};
+struct IfCycleC {};
+
+struct CycleA : public IfCycleA {
+  CycleA(std::shared_ptr<IfCycleB> b) {}
+};
+
+struct CycleB : public IfCycleB {
+  CycleB(std::shared_ptr<IfCycleC> b) {}
+};
+
+struct CycleC : public IfCycleC  {
+  CycleC(std::shared_ptr<IfCycleA> a) {}
+};
+
 inline int int_function() {
   return 18;
 }
