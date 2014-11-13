@@ -28,14 +28,6 @@ namespace cppdi {
 class InjectorFactory {
  public:
   /**
-   * Creates injector factory
-   *
-   * @param debug flag which enables/disables debug mode of Injectors. Injectors
-   *        in debug mode have additional checks (automatic cycle detection)
-   */
-  InjectorFactory(bool debug = false);
-
-  /**
    * Creates injector from single module
    *
    * @param module module to create injector from
@@ -65,9 +57,6 @@ class InjectorFactory {
    */
   std::shared_ptr<Injector> Create(
       const std::function<void(Binder *binder)> &binding_function);
-
- private:
-  bool debug_;
 };
 
 }  // namespace cppdi

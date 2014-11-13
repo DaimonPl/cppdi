@@ -78,7 +78,7 @@ class Injector : public std::enable_shared_from_this<Injector> {
     DISPOSED
   };
 
-  explicit Injector(bool debug,
+  explicit Injector(
       std::unordered_map<internal::Key,
           std::shared_ptr<Provider<internal::SharedAny>>>&&providers);
   std::shared_ptr<Provider<internal::SharedAny>> &GetProvider(const internal::Key &key);
@@ -86,8 +86,10 @@ class Injector : public std::enable_shared_from_this<Injector> {
 
   State state_;
   std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>>provider_map_;
-  bool debug_;
+
+#ifdef _CPPDI_DEBUG_MODE_
   internal::CycleVerifier cycle_verifier_;
+#endif
 
   friend InjectorFactory;
 };

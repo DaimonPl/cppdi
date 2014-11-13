@@ -22,41 +22,34 @@
 namespace cppdi {
 namespace internal {
 
+#ifdef _CPPDI_DEBUG_MODE_
+
 class CycleCheckGuard;
 
 class CycleVerifier {
- public:
-  CycleVerifier(bool debug) : debug_(debug) {}
-
- private:
   void verify(const Key &key) {
-    if (debug_) {
-      if (key_set_.find(key) != key_set_.end()) {
-        std::string msg("Cycle detected: ");
+    if (key_set_.find(key) != key_set_.end()) {
+      std::string msg("Cycle detected: ");
 
-        for (Key &k : keys_) {
-          msg += k.GetFullName() + " -> ";
-        }
-        msg += key.GetFullName();
-
-        throw InjectionCycleError(msg);
+      for (Key &k : keys_) {
+        msg += k.GetFullName() + " -> ";
       }
+      msg += key.GetFullName();
 
-      key_set_.emplace(key);
-      keys_.push_back(key);
+      throw InjectionCycleError(msg);
     }
+
+    key_set_.emplace(key);
+    keys_.push_back(key);
   }
 
   void pop() {
-    if (debug_) {
-      assert(!key_set_.empty());
+    assert(!key_set_.empty());
 
-      key_set_.erase(keys_.back());
-      keys_.pop_back();
-    }
+    key_set_.erase(keys_.back());
+    keys_.pop_back();
   }
 
-  bool debug_;
   std::deque<Key> keys_;
   std::set<Key> key_set_;
 
@@ -86,6 +79,8 @@ class CycleCheckGuard {
  private:
   CycleVerifier *verifier_;
 };
+
+#endif
 
 }  // namespace internal
 }  // namespace cppdi

@@ -50,8 +50,10 @@ TEST(illegal_injection_test, injection_after_disposal) {
   EXPECT_THROW(b_provider->Get(), InjectionError);
 }
 
+#ifdef _CPPDI_DEBUG_MODE_
+
 TEST(illegal_injection_test, cyclic_binding_self) {
-  cppdi::InjectorFactory factory(true);
+  cppdi::InjectorFactory factory;
 
   shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
     binder->BindConstructor<SelfCyclic, shared_ptr<SelfCyclic>>();
@@ -62,7 +64,7 @@ TEST(illegal_injection_test, cyclic_binding_self) {
 }
 
 TEST(illegal_injection_test, cyclic_binding_non_direct) {
-  cppdi::InjectorFactory factory(true);
+  cppdi::InjectorFactory factory;
 
   shared_ptr<Injector> injector = factory.Create([](Binder *binder) {
     binder->BindConstructor<CycleA, shared_ptr<IfCycleB>>();
@@ -76,3 +78,4 @@ TEST(illegal_injection_test, cyclic_binding_non_direct) {
 
   EXPECT_THROW(injector->GetInstance<shared_ptr<IfCycleA>>(), InjectionCycleError);
 }
+#endif

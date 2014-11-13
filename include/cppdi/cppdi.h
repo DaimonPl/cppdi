@@ -18,6 +18,12 @@
  * User of cppdi should include only this file
  */
 
+/**
+ * Compile time flags:
+ * _CPPDI_DEBUG_MODE_ - enables additional runtime checks (including automatic
+ *                      cycle detection)
+ */
+
 #include "cppdi/dispose_guard.h"
 #include "cppdi/binder.h"
 #include "cppdi/errors.h"

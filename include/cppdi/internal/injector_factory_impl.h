@@ -20,8 +20,6 @@
 
 namespace cppdi {
 
-inline InjectorFactory::InjectorFactory(bool debug) : debug_(debug) {}
-
 inline std::shared_ptr<Injector> InjectorFactory::Create(const Module &module) const {
   return Create({ &module });
 }
@@ -34,7 +32,7 @@ inline std::shared_ptr<Injector> InjectorFactory::Create(
     module->Configure(&binder);
   }
 
-  Injector *injector = new Injector(debug_, std::move(binder.provider_map_));
+  Injector *injector = new Injector(std::move(binder.provider_map_));
 
   return std::shared_ptr<Injector>(injector);
 }
@@ -45,7 +43,7 @@ inline std::shared_ptr<Injector> InjectorFactory::Create(
 
   binding_function(&binder);
 
-  Injector *injector = new Injector(debug_, std::move(binder.provider_map_));
+  Injector *injector = new Injector(std::move(binder.provider_map_));
 
   return std::shared_ptr<Injector>(injector);
 }

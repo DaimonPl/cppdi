@@ -25,10 +25,8 @@
 
 namespace cppdi {
 
-inline Injector::Injector(bool debug,
-    std::unordered_map<internal::Key,
-        std::shared_ptr<Provider<internal::SharedAny>>>&&providers) : cycle_verifier_(debug) {
-  debug_ = debug;
+inline Injector::Injector(std::unordered_map<internal::Key,
+        std::shared_ptr<Provider<internal::SharedAny>>>&&providers) {
   provider_map_ = std::move(providers);
   state_ = UNINITIALIZED;
 }
@@ -71,7 +69,9 @@ template<typename T>
 T Injector::GetInstance(const std::string &name) {
   internal::Key key(typeid(T), name);
 
+#ifdef _CPPDI_DEBUG_MODE_
   internal::CycleCheckGuard cycleCheckGuard(&cycle_verifier_, key);
+#endif
 
   return GetProvider(key)->Get().as<T>();
 }
