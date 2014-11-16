@@ -22,6 +22,7 @@
 #include "cppdi/internal/raw_provider_wrapper.h"
 #include "cppdi/internal/linking_provider.h"
 #include "cppdi/internal/producing_provider.h"
+#include "cppdi/internal/traits.h"
 
 namespace cppdi {
 
@@ -95,7 +96,7 @@ auto Injector::GetNamedInstance(const std::string &name)
   internal::CycleCheckGuard cycleCheckGuard(&cycle_verifier_, key);
 #endif
 
-  auto provider = GetAnyProvider(key);
+  auto &provider = GetAnyProvider(key);
 
   if (!provider) {
     throw InjectionError(std::string("No binding for " + key.GetFullName()));
@@ -121,13 +122,13 @@ auto Injector::GetNamedInstance(const std::string &name)
   internal::CycleCheckGuard cycleCheckGuard(&cycle_verifier_, key);
 #endif
 
-  auto ptr_provider = GetPtrProvider(key);
+  auto &ptr_provider = GetPtrProvider(key);
 
   if (ptr_provider) {
     return std::static_pointer_cast<U>(ptr_provider->Get());
   }
 
-  auto any_provider = GetAnyProvider(key);
+  auto &any_provider = GetAnyProvider(key);
 
   if (!any_provider) {
     throw InjectionError(std::string("No binding for " + key.GetFullName()));
