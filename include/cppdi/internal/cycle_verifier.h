@@ -9,12 +9,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CPPDI_CYCLE_VERIFIER_H_
-#define CPPDI_CYCLE_VERIFIER_H_
+#ifndef CPPDI_INTERNAL_CYCLE_VERIFIER_H_
+#define CPPDI_INTERNAL_CYCLE_VERIFIER_H_
 
-#include<cassert>
-#include<deque>
-#include<set>
+#include <cassert>
+#include <deque>
+#include <set>
+#include <string>
 
 #include "cppdi/errors.h"
 #include "cppdi/internal/key.h"
@@ -67,6 +68,9 @@ class CycleCheckGuard {
     verifier_->pop();
   }
 
+ private:
+  CycleVerifier *verifier_;
+
   // make DisposeGuard an non-copyable, non-assignable, stack-only type
   CycleCheckGuard(CycleCheckGuard && guard) = delete;
   CycleCheckGuard(const CycleCheckGuard &) = delete;
@@ -76,8 +80,6 @@ class CycleCheckGuard {
   void operator delete(void *) = delete;
   void *operator new[](size_t) = delete;
   void operator delete[](void *) = delete;
- private:
-  CycleVerifier *verifier_;
 };
 
 #endif
@@ -85,4 +87,4 @@ class CycleCheckGuard {
 }  // namespace internal
 }  // namespace cppdi
 
-#endif  // CPPDI_CYCLE_VERIFIER_H_
+#endif  // CPPDI_INTERNAL_CYCLE_VERIFIER_H_

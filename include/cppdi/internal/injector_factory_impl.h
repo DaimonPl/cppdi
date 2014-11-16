@@ -20,8 +20,9 @@
 
 namespace cppdi {
 
-inline std::shared_ptr<Injector> InjectorFactory::Create(const Module &module) const {
-  return Create({ &module });
+inline std::shared_ptr<Injector> InjectorFactory::Create(
+    const Module &module) const {
+  return Create( { &module });
 }
 
 inline std::shared_ptr<Injector> InjectorFactory::Create(

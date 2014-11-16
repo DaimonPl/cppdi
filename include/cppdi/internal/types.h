@@ -9,33 +9,29 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CPPDI_INTERNAL_LINKING_PROVIDER_H_
-#define CPPDI_INTERNAL_LINKING_PROVIDER_H_
+#ifndef CPPDI_INTERNAL_TYPES_H_
+#define CPPDI_INTERNAL_TYPES_H_
 
 #include <memory>
-#include <string>
+#include <unordered_map>
 
-#include "cppdi/injector.h"
 #include "cppdi/provider.h"
+#include "cppdi/internal/key.h"
 #include "cppdi/internal/shared_any.h"
 
 namespace cppdi {
 namespace internal {
 
-template<typename F, typename T>
-class LinkingProvider : public Provider<std::shared_ptr<void>> {
- public:
-  explicit LinkingProvider(const std::string &t_name);
-  std::shared_ptr<void> Get() override;
+template<typename T>
+using BindingMap = std::unordered_map<internal::Key, std::shared_ptr<Provider<T>>>;
 
- private:
-  void Initialize(const std::shared_ptr<cppdi::Injector> &injector) override;
+typedef Provider<internal::SharedAny> SharedAnyProvider;
+typedef Provider<std::shared_ptr<void>> VoidPtrProvider;
 
-  std::string t_name_;
-  std::shared_ptr<cppdi::Injector> injector_;
-};
+typedef std::shared_ptr<Provider<internal::SharedAny>> SharedAnyProviderPtr;
+typedef std::shared_ptr<Provider<std::shared_ptr<void>>> VoidPtrProviderPtr;
 
 }  // namespace internal
 }  // namespace cppdi
 
-#endif  // CPPDI_INTERNAL_LINKING_PROVIDER_H_
+#endif  // CPPDI_INTERNAL_TYPES_H_

@@ -25,10 +25,8 @@
 
 namespace cppdi {
 
-inline Injector::Injector(
-    std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>> &&any_providers,
-    std::unordered_map<internal::Key, std::shared_ptr<Provider<std::shared_ptr<void>>>> &&ptr_providers
-  ) {
+inline Injector::Injector(internal::BindingMap<internal::SharedAny> &&any_providers,
+                          internal::BindingMap<std::shared_ptr<void>> &&ptr_providers) {
   shared_any_provider_map_ = std::move(any_providers);
   shared_ptr_provider_map_ = std::move(ptr_providers);
   state_ = UNINITIALIZED;
@@ -50,7 +48,7 @@ inline void Injector::AutoInitialize() {
   }
 }
 
-inline std::shared_ptr<Provider<internal::SharedAny>> &Injector::GetAnyProvider(
+inline internal::SharedAnyProviderPtr &Injector::GetAnyProvider(
     const internal::Key &key) {
   auto provider_it = shared_any_provider_map_.find(key);
 
@@ -61,7 +59,7 @@ inline std::shared_ptr<Provider<internal::SharedAny>> &Injector::GetAnyProvider(
   return provider_it->second;
 }
 
-inline std::shared_ptr<Provider<std::shared_ptr<void>>> &Injector::GetPtrProvider(
+inline internal::VoidPtrProviderPtr &Injector::GetPtrProvider(
     const internal::Key &key) {
   auto provider_it = shared_ptr_provider_map_.find(key);
 

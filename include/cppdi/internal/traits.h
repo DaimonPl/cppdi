@@ -9,8 +9,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CPPDI_TRAITS_H_
-#define CPPDI_TRAITS_H_
+#ifndef CPPDI_INTERNAL_TRAITS_H_
+#define CPPDI_INTERNAL_TRAITS_H_
 
 #include <memory>
 #include <type_traits>
@@ -38,4 +38,4 @@ using is_shared_ptr =
 }  // namespace internal
 }  // namespace cppdi
 
-#endif  // CPPDI_TRAITS_H_
+#endif  // CPPDI_INTERNAL_TRAITS_H_

@@ -13,6 +13,7 @@
 #define CPPDI_INTERNAL_LINKING_PROVIDER_IMPL_H_
 
 #include <memory>
+#include <string>
 
 #include "cppdi/internal/linking_provider.h"
 
@@ -26,10 +27,8 @@ LinkingProvider<F, T>::LinkingProvider(const std::string &t_name) {
 
 template<typename F, typename T>
 std::shared_ptr<void> LinkingProvider<F, T>::Get() {
-  std::shared_ptr<T> instance = injector_->GetInstance<std::shared_ptr<T>>(
-      t_name_);
-
-  return std::static_pointer_cast<F>(instance);
+  return std::static_pointer_cast<F>(
+      injector_->GetInstance<std::shared_ptr<T>>(t_name_));
 }
 
 template<typename F, typename T>

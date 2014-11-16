@@ -28,6 +28,9 @@ class DisposeGuard {
     injector_->Dispose();
   }
 
+ private:
+  std::shared_ptr<Injector> injector_;
+
   // make DisposeGuard an non-copyable, non-assignable, stack-only type
   DisposeGuard(DisposeGuard && guard) = delete;
   DisposeGuard(const DisposeGuard &) = delete;
@@ -37,8 +40,6 @@ class DisposeGuard {
   void operator delete(void *) = delete;
   void *operator new[](size_t) = delete;
   void operator delete[](void *) = delete;
- private:
-  std::shared_ptr<Injector> injector_;
 };
 
 }  // namespace cppdi

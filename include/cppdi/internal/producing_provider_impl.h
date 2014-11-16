@@ -32,13 +32,13 @@ std::shared_ptr<void> ProducingProvider<T, Args...>::Get() {
   return instance_;
 }
 
-template<typename T, typename... Args>
-void ProducingProvider<T, Args...>::Initialize(const std::shared_ptr<cppdi::Injector> &injector) {
+template<typename T, typename ...Args>
+void ProducingProvider<T, Args...>::Initialize(
+    const std::shared_ptr<cppdi::Injector> &injector) {
   injector_ = injector;
 }
 
-}
-  // namespace internal
-} // namespace cppdi
+}  // namespace internal
+}  // namespace cppdi
 
 #endif  // CPPDI_INTERNAL_PRODUCING_PROVIDER_IMPL_H_

@@ -22,6 +22,7 @@
 #include "cppdi/internal/key.h"
 #include "cppdi/internal/shared_any.h"
 #include "cppdi/internal/traits.h"
+#include "cppdi/internal/types.h"
 
 namespace cppdi {
 
@@ -66,12 +67,6 @@ class Injector : public std::enable_shared_from_this<Injector> {
    */
   void Dispose();
 
-  // ensure injector is not passed by value
-  Injector(const Injector &) = delete;
-  Injector(Injector &&) = delete;
-  void operator=(const Injector &) = delete;
-  void operator=(Injector &&) = delete;
-
  private:
   enum State {
     UNINITIALIZED,
@@ -79,12 +74,8 @@ class Injector : public std::enable_shared_from_this<Injector> {
     DISPOSED
   };
 
-  explicit Injector(
-    std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>>
-    &&shared_any_providers,
-    std::unordered_map<internal::Key, std::shared_ptr<Provider<std::shared_ptr<void>>>>
-    &&shared_ptr_providers
-  );
+  explicit Injector(internal::BindingMap<internal::SharedAny> &&shared_any_providers,
+                    internal::BindingMap<std::shared_ptr<void>> &&shared_ptr_providers);
   std::shared_ptr<Provider<internal::SharedAny>> &GetAnyProvider(const internal::Key &key);
   std::shared_ptr<Provider<std::shared_ptr<void>>> &GetPtrProvider(const internal::Key &key);
   void AutoInitialize();
@@ -98,17 +89,21 @@ class Injector : public std::enable_shared_from_this<Injector> {
       -> typename std::enable_if<internal::is_shared_ptr<T>{}, T>::type;
 
   State state_;
-  std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>>
-    shared_any_provider_map_;
-  std::unordered_map<internal::Key, std::shared_ptr<Provider<std::shared_ptr<void>>>>
-    shared_ptr_provider_map_;
+  internal::BindingMap<internal::SharedAny> shared_any_provider_map_;
+  internal::BindingMap<std::shared_ptr<void>> shared_ptr_provider_map_;
 
-  std::shared_ptr<Provider<internal::SharedAny>> empty_any_provider_;
-  std::shared_ptr<Provider<std::shared_ptr<void>>> empty_ptr_provider_;
+  internal::SharedAnyProviderPtr empty_any_provider_;
+  internal::VoidPtrProviderPtr empty_ptr_provider_;
 
 #ifdef _CPPDI_DEBUG_MODE_
   internal::CycleVerifier cycle_verifier_;
 #endif
+
+  // ensure injector is not passed by value
+  Injector(const Injector &) = delete;
+  Injector(Injector &&) = delete;
+  void operator=(const Injector &) = delete;
+  void operator=(Injector &&) = delete;
 
   friend InjectorFactory;
 };

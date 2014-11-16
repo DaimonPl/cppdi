@@ -19,7 +19,8 @@
 #include "cppdi/errors.h"
 #include "cppdi/provider.h"
 #include "cppdi/internal/key.h"
-#include "internal/shared_any.h"
+#include "cppdi/internal/shared_any.h"
+#include "cppdi/internal/types.h"
 
 namespace cppdi {
 
@@ -152,29 +153,32 @@ class Binder {
    * of T.
    */
   template<typename T, typename ...Args>
-  void BindFunction(const std::function<T(Args...)> &producing_func, const std::string &name);
+  void BindFunction(const std::function<T(Args...)> &producing_func,
+                    const std::string &name);
+
+ private:
+  Binder() {}
+
+  void AssertBindingNotExists(const internal::Key &key);
+  template<typename T>
+  void CreateProviderBinding(const std::string &name,
+                             const internal::SharedAnyProviderPtr &provider);
+  template<typename T>
+  void CreateProviderBinding(const std::string &name,
+                             const internal::VoidPtrProviderPtr &provider);
+  void CreateBinding(const internal::Key &key,
+                     const internal::SharedAnyProviderPtr &provider);
+  void CreateBinding(const internal::Key &key,
+                     const internal::VoidPtrProviderPtr &provider);
+
+  internal::BindingMap<internal::SharedAny> shared_any_provider_map_;
+  internal::BindingMap<std::shared_ptr<void>> shared_ptr_provider_map_;
 
   // ensure binder is not passed by value
   Binder(const Binder &) = delete;
   Binder(Binder &&) = delete;
   void operator=(const Binder &) = delete;
   void operator=(Binder &&) = delete;
-
- private:
-  Binder() {};
-
-  void AssertBindingNotExists(const internal::Key &key);
-  template<typename T>
-  void CreateProviderBinding(const std::string &name, const std::shared_ptr<Provider<internal::SharedAny>> &provider);
-  template<typename T>
-  void CreateProviderBinding(const std::string &name, const std::shared_ptr<Provider<std::shared_ptr<void>>> &provider);
-  void CreateBinding(const internal::Key &key, const std::shared_ptr<Provider<internal::SharedAny>> &provider);
-  void CreateBinding(const internal::Key &key, const std::shared_ptr<Provider<std::shared_ptr<void>>> &provider);
-
-  std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>>
-      shared_any_provider_map_;
-  std::unordered_map<internal::Key, std::shared_ptr<Provider<std::shared_ptr<void>>>>
-      shared_ptr_provider_map_;
 
   friend InjectorFactory;
 };

@@ -33,7 +33,7 @@ template<typename T, typename ... Args>
 void Binder::BindConstructor(const std::string &name) {
   internal::Key key(typeid(std::shared_ptr<T>), name);
 
-  std::shared_ptr<Provider<std::shared_ptr<void>>> provider =
+  internal::VoidPtrProviderPtr provider =
       std::make_shared<internal::ProducingProvider<T, Args...>>();
 
   CreateBinding(key, provider);
@@ -52,12 +52,14 @@ void Binder::BindTypes() {
 
 template<typename F, typename T>
 void Binder::BindTypes(const std::string &f_name, const std::string &t_name) {
-  static_assert(std::is_base_of<F, T>::value, "BindTypes<F, T>() - T must be a descendant of F");
-  static_assert(!std::is_same<F, T>::value, "BindTypes<F, T>() - T cannot be same as F");
+  static_assert(std::is_base_of<F, T>::value,
+                "BindTypes<F, T>() - T must be a descendant of F");
+  static_assert(!std::is_same<F, T>::value,
+                "BindTypes<F, T>() - T cannot be same as F");
 
   internal::Key source_key(typeid(std::shared_ptr<F>), f_name);
 
-  std::shared_ptr<Provider<std::shared_ptr<void>>> provider =
+  internal::VoidPtrProviderPtr provider =
       std::make_shared<internal::LinkingProvider<F, T>>(t_name);
 
   CreateBinding(source_key, provider);
@@ -73,7 +75,7 @@ template<typename T>
 void Binder::BindInstance(const T &instance, const std::string &name) {
   internal::Key key(typeid(T), name);
 
-  std::shared_ptr<Provider<internal::SharedAny>> provider =
+  internal::SharedAnyProviderPtr provider =
       std::make_shared<internal::InstanceProvider>(internal::SharedAny(instance));
 
   CreateBinding(key, provider);
@@ -87,11 +89,12 @@ void Binder::BindProvider() {
 
 template<typename T, typename P>
 void Binder::BindProvider(const std::string &name) {
-  static_assert(std::is_base_of<Provider<T>, P>::value, "BindProvider<T, P>() - P must implement Provider<T>");
+  static_assert(std::is_base_of<Provider<T>, P>::value,
+                "BindProvider<T, P>() - P must implement Provider<T>");
 
   internal::Key key(typeid(T), name);
   std::shared_ptr<Provider<T>> provider = std::make_shared<P>();
-  std::shared_ptr<Provider<internal::SharedAny>> any_provider =
+  internal::SharedAnyProviderPtr any_provider =
       std::make_shared<internal::ConcreteProviderWrapper<T>>(provider);
 
   CreateBinding(key, any_provider);
@@ -108,7 +111,7 @@ void Binder::BindFunction(const std::function<T(Args...)> &producing_func,
                           const std::string &name) {
   internal::Key key(typeid(T), name);
 
-  std::shared_ptr<Provider<internal::SharedAny>> provider =
+  internal::SharedAnyProviderPtr provider =
       std::make_shared<internal::FunctionProvider<T, Args...>>(producing_func);
 
   CreateBinding(key, provider);
@@ -134,12 +137,12 @@ inline void Binder::CreateBinding(
 template<typename T>
 void Binder::CreateProviderBinding(
     const std::string &name,
-    const std::shared_ptr<Provider<internal::SharedAny>> &provider) {
+    const internal::SharedAnyProviderPtr &provider) {
   internal::Key provider_key(typeid(std::shared_ptr<Provider<T>>), name);
 
   std::shared_ptr<Provider<T>> concrete_provider =
       std::make_shared<internal::RawProviderWrapper<T>>(provider);
-  std::shared_ptr<Provider<std::shared_ptr<void>>> provider_of_provider =
+  internal::VoidPtrProviderPtr provider_of_provider =
       std::make_shared<internal::PtrInstanceProvider>(concrete_provider);
 
   CreateBinding(provider_key, provider_of_provider);
@@ -148,10 +151,10 @@ void Binder::CreateProviderBinding(
 template<typename T>
 void Binder::CreateProviderBinding(
     const std::string &name,
-    const std::shared_ptr<Provider<std::shared_ptr<void>>>&provider) {
+    const internal::VoidPtrProviderPtr &provider) {
   internal::Key provider_key(typeid(std::shared_ptr<Provider<T>>), name);
 
-  std::shared_ptr<Provider<std::shared_ptr<void>>> provider_of_provider =
+  internal::VoidPtrProviderPtr provider_of_provider =
         std::make_shared<internal::PtrInstanceProvider>(provider);
 
   CreateBinding(provider_key, provider_of_provider);
@@ -165,7 +168,6 @@ inline void Binder::AssertBindingNotExists(const internal::Key &key) {
   }
 }
 
-}
-  // namespace cppdi
+}  // namespace cppdi
 
 #endif  // CPPDI_INTERNAL_BINDER_IMPL_H_
