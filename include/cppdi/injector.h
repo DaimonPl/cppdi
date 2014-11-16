@@ -76,8 +76,8 @@ class Injector : public std::enable_shared_from_this<Injector> {
 
   explicit Injector(internal::BindingMap<internal::SharedAny> &&shared_any_providers,
                     internal::BindingMap<std::shared_ptr<void>> &&shared_ptr_providers);
-  std::shared_ptr<Provider<internal::SharedAny>> &GetAnyProvider(const internal::Key &key);
-  std::shared_ptr<Provider<std::shared_ptr<void>>> &GetPtrProvider(const internal::Key &key);
+  internal::SharedAnyProviderPtr &GetAnyProvider(const internal::Key &key);
+  internal::VoidPtrProviderPtr &GetPtrProvider(const internal::Key &key);
   void AutoInitialize();
 
   template <typename T>
