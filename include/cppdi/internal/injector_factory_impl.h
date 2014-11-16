@@ -32,7 +32,8 @@ inline std::shared_ptr<Injector> InjectorFactory::Create(
     module->Configure(&binder);
   }
 
-  Injector *injector = new Injector(std::move(binder.provider_map_));
+  Injector *injector = new Injector(std::move(binder.shared_any_provider_map_),
+                                    std::move(binder.shared_ptr_provider_map_));
 
   return std::shared_ptr<Injector>(injector);
 }
@@ -43,7 +44,8 @@ inline std::shared_ptr<Injector> InjectorFactory::Create(
 
   binding_function(&binder);
 
-  Injector *injector = new Injector(std::move(binder.provider_map_));
+  Injector *injector = new Injector(std::move(binder.shared_any_provider_map_),
+                                    std::move(binder.shared_ptr_provider_map_));
 
   return std::shared_ptr<Injector>(injector);
 }

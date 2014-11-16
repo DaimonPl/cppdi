@@ -166,9 +166,15 @@ class Binder {
   void AssertBindingNotExists(const internal::Key &key);
   template<typename T>
   void CreateProviderBinding(const std::string &name, const std::shared_ptr<Provider<internal::SharedAny>> &provider);
+  template<typename T>
+  void CreateProviderBinding(const std::string &name, const std::shared_ptr<Provider<std::shared_ptr<void>>> &provider);
   void CreateBinding(const internal::Key &key, const std::shared_ptr<Provider<internal::SharedAny>> &provider);
+  void CreateBinding(const internal::Key &key, const std::shared_ptr<Provider<std::shared_ptr<void>>> &provider);
 
-  std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>> provider_map_;
+  std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>>
+      shared_any_provider_map_;
+  std::unordered_map<internal::Key, std::shared_ptr<Provider<std::shared_ptr<void>>>>
+      shared_ptr_provider_map_;
 
   friend InjectorFactory;
 };

@@ -22,10 +22,10 @@ namespace cppdi {
 namespace internal {
 
 template<typename F, typename T>
-class LinkingProvider : public Provider<SharedAny> {
+class LinkingProvider : public Provider<std::shared_ptr<void>> {
  public:
   explicit LinkingProvider(const std::string &t_name);
-  SharedAny Get() override;
+  std::shared_ptr<void> Get() override;
 
  private:
   void Initialize(const std::shared_ptr<cppdi::Injector> &injector) override;

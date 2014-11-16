@@ -21,9 +21,9 @@ namespace cppdi {
 namespace internal {
 
 template<typename T, typename... Args>
-SharedAny ProducingProvider<T, Args...>::Get() {
-  if (instance_.is_null()) {
-    instance_ = SharedAny(std::make_shared<T>(injector_->GetInstance<Args>()...));
+std::shared_ptr<void> ProducingProvider<T, Args...>::Get() {
+  if (!instance_) {
+    instance_ = std::make_shared<T>(injector_->GetInstance<Args>()...);
 
     // instance was created, pointer to injector can be removed
     injector_.reset();

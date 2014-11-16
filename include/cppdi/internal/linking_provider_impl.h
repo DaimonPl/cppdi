@@ -25,11 +25,11 @@ LinkingProvider<F, T>::LinkingProvider(const std::string &t_name) {
 }
 
 template<typename F, typename T>
-SharedAny LinkingProvider<F, T>::Get() {
+std::shared_ptr<void> LinkingProvider<F, T>::Get() {
   std::shared_ptr<T> instance = injector_->GetInstance<std::shared_ptr<T>>(
       t_name_);
 
-  return SharedAny(std::static_pointer_cast<F>(instance));
+  return std::static_pointer_cast<F>(instance);
 }
 
 template<typename F, typename T>

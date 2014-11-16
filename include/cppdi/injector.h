@@ -21,6 +21,7 @@
 #include "cppdi/internal/cycle_verifier.h"
 #include "cppdi/internal/key.h"
 #include "cppdi/internal/shared_any.h"
+#include "cppdi/internal/traits.h"
 
 namespace cppdi {
 
@@ -48,9 +49,9 @@ class Injector : public std::enable_shared_from_this<Injector> {
   T GetInstance();
 
   /**
-   * Has same behavor as GetInstance<T> but returns named instance of T.
+   * Has same behavior as GetInstance<T>() but injects named binding of T.
    */
-  template<typename T>
+  template <typename T>
   T GetInstance(const std::string &name);
 
   /**
@@ -79,13 +80,31 @@ class Injector : public std::enable_shared_from_this<Injector> {
   };
 
   explicit Injector(
-      std::unordered_map<internal::Key,
-          std::shared_ptr<Provider<internal::SharedAny>>>&&providers);
-  std::shared_ptr<Provider<internal::SharedAny>> &GetProvider(const internal::Key &key);
+    std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>>
+    &&shared_any_providers,
+    std::unordered_map<internal::Key, std::shared_ptr<Provider<std::shared_ptr<void>>>>
+    &&shared_ptr_providers
+  );
+  std::shared_ptr<Provider<internal::SharedAny>> &GetAnyProvider(const internal::Key &key);
+  std::shared_ptr<Provider<std::shared_ptr<void>>> &GetPtrProvider(const internal::Key &key);
   void AutoInitialize();
 
+  template <typename T>
+  auto GetNamedInstance(const std::string &name)
+      -> typename std::enable_if<!internal::is_shared_ptr<T>{}, T>::type;
+
+  template <typename T>
+  auto GetNamedInstance(const std::string &name)
+      -> typename std::enable_if<internal::is_shared_ptr<T>{}, T>::type;
+
   State state_;
-  std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>>provider_map_;
+  std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>>
+    shared_any_provider_map_;
+  std::unordered_map<internal::Key, std::shared_ptr<Provider<std::shared_ptr<void>>>>
+    shared_ptr_provider_map_;
+
+  std::shared_ptr<Provider<internal::SharedAny>> empty_any_provider_;
+  std::shared_ptr<Provider<std::shared_ptr<void>>> empty_ptr_provider_;
 
 #ifdef _CPPDI_DEBUG_MODE_
   internal::CycleVerifier cycle_verifier_;

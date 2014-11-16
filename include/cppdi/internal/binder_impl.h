@@ -24,6 +24,7 @@
 #include "cppdi/internal/instance_provider.h"
 #include "cppdi/internal/linking_provider.h"
 #include "cppdi/internal/producing_provider.h"
+#include "cppdi/internal/ptr_instance_provider.h"
 #include "cppdi/internal/raw_provider_wrapper.h"
 
 namespace cppdi {
@@ -32,7 +33,7 @@ template<typename T, typename ... Args>
 void Binder::BindConstructor(const std::string &name) {
   internal::Key key(typeid(std::shared_ptr<T>), name);
 
-  std::shared_ptr<Provider<internal::SharedAny>> provider =
+  std::shared_ptr<Provider<std::shared_ptr<void>>> provider =
       std::make_shared<internal::ProducingProvider<T, Args...>>();
 
   CreateBinding(key, provider);
@@ -56,7 +57,7 @@ void Binder::BindTypes(const std::string &f_name, const std::string &t_name) {
 
   internal::Key source_key(typeid(std::shared_ptr<F>), f_name);
 
-  std::shared_ptr<Provider<internal::SharedAny>> provider =
+  std::shared_ptr<Provider<std::shared_ptr<void>>> provider =
       std::make_shared<internal::LinkingProvider<F, T>>(t_name);
 
   CreateBinding(source_key, provider);
@@ -119,7 +120,15 @@ inline void Binder::CreateBinding(
     const std::shared_ptr<Provider<internal::SharedAny>> &provider) {
   AssertBindingNotExists(key);
 
-  provider_map_.emplace(key, provider);
+  shared_any_provider_map_.emplace(key, provider);
+}
+
+inline void Binder::CreateBinding(
+    const internal::Key &key,
+    const std::shared_ptr<Provider<std::shared_ptr<void>>> &provider) {
+  AssertBindingNotExists(key);
+
+  shared_ptr_provider_map_.emplace(key, provider);
 }
 
 template<typename T>
@@ -130,14 +139,27 @@ void Binder::CreateProviderBinding(
 
   std::shared_ptr<Provider<T>> concrete_provider =
       std::make_shared<internal::RawProviderWrapper<T>>(provider);
-  std::shared_ptr<Provider<internal::SharedAny>> provider_of_provider =
-      std::make_shared<internal::InstanceProvider>(internal::SharedAny(concrete_provider));
+  std::shared_ptr<Provider<std::shared_ptr<void>>> provider_of_provider =
+      std::make_shared<internal::PtrInstanceProvider>(concrete_provider);
+
+  CreateBinding(provider_key, provider_of_provider);
+}
+
+template<typename T>
+void Binder::CreateProviderBinding(
+    const std::string &name,
+    const std::shared_ptr<Provider<std::shared_ptr<void>>>&provider) {
+  internal::Key provider_key(typeid(std::shared_ptr<Provider<T>>), name);
+
+  std::shared_ptr<Provider<std::shared_ptr<void>>> provider_of_provider =
+        std::make_shared<internal::PtrInstanceProvider>(provider);
 
   CreateBinding(provider_key, provider_of_provider);
 }
 
 inline void Binder::AssertBindingNotExists(const internal::Key &key) {
-  if (provider_map_.find(key) != provider_map_.end()) {
+  if (shared_any_provider_map_.find(key) != shared_any_provider_map_.end() ||
+      shared_ptr_provider_map_.find(key) != shared_ptr_provider_map_.end()) {
     throw BindingError(
         std::string("Binding already exists for " + key.GetFullName()));
   }

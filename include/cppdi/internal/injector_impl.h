@@ -25,9 +25,12 @@
 
 namespace cppdi {
 
-inline Injector::Injector(std::unordered_map<internal::Key,
-        std::shared_ptr<Provider<internal::SharedAny>>>&&providers) {
-  provider_map_ = std::move(providers);
+inline Injector::Injector(
+    std::unordered_map<internal::Key, std::shared_ptr<Provider<internal::SharedAny>>> &&any_providers,
+    std::unordered_map<internal::Key, std::shared_ptr<Provider<std::shared_ptr<void>>>> &&ptr_providers
+  ) {
+  shared_any_provider_map_ = std::move(any_providers);
+  shared_ptr_provider_map_ = std::move(ptr_providers);
   state_ = UNINITIALIZED;
 }
 
@@ -37,24 +40,33 @@ inline void Injector::AutoInitialize() {
 
     std::shared_ptr<Injector> this_ptr = shared_from_this();
 
-    for (auto &provider_binding : provider_map_) {
+    for (auto &provider_binding : shared_any_provider_map_) {
+      provider_binding.second->Initialize(this_ptr);
+    }
+
+    for (auto &provider_binding : shared_ptr_provider_map_) {
       provider_binding.second->Initialize(this_ptr);
     }
   }
 }
 
-inline std::shared_ptr<Provider<internal::SharedAny>> &Injector::GetProvider(
+inline std::shared_ptr<Provider<internal::SharedAny>> &Injector::GetAnyProvider(
     const internal::Key &key) {
-  if (state_ == DISPOSED) {
-    throw InjectionError("Injector has been disposed!");
+  auto provider_it = shared_any_provider_map_.find(key);
+
+  if (provider_it == shared_any_provider_map_.end()) {
+    return empty_any_provider_;
   }
 
-  AutoInitialize();
+  return provider_it->second;
+}
 
-  auto provider_it = provider_map_.find(key);
+inline std::shared_ptr<Provider<std::shared_ptr<void>>> &Injector::GetPtrProvider(
+    const internal::Key &key) {
+  auto provider_it = shared_ptr_provider_map_.find(key);
 
-  if (provider_it == provider_map_.end()) {
-    throw InjectionError(std::string("No binding for ") + key.GetFullName());
+  if (provider_it == shared_ptr_provider_map_.end()) {
+    return empty_ptr_provider_;
   }
 
   return provider_it->second;
@@ -65,15 +77,64 @@ T Injector::GetInstance() {
   return GetInstance<T>(std::string());
 }
 
-template<typename T>
+template <typename T>
 T Injector::GetInstance(const std::string &name) {
+  return GetNamedInstance<T>(name);
+}
+
+template<typename T>
+auto Injector::GetNamedInstance(const std::string &name)
+    -> typename std::enable_if<!internal::is_shared_ptr<T>{}, T>::type {
+  if (state_ == DISPOSED) {
+    throw InjectionError("Injector has been disposed!");
+  }
+
+  AutoInitialize();
+
   internal::Key key(typeid(T), name);
 
 #ifdef _CPPDI_DEBUG_MODE_
   internal::CycleCheckGuard cycleCheckGuard(&cycle_verifier_, key);
 #endif
 
-  return GetProvider(key)->Get().as<T>();
+  auto provider = GetAnyProvider(key);
+
+  if (!provider) {
+    throw InjectionError(std::string("No binding for " + key.GetFullName()));
+  }
+
+  return provider->Get().as<T>();
+}
+
+template<typename T>
+auto Injector::GetNamedInstance(const std::string &name)
+    -> typename std::enable_if<internal::is_shared_ptr<T>{}, T>::type {
+  using U = typename std::decay<T>::type::element_type;
+
+  if (state_ == DISPOSED) {
+    throw InjectionError("Injector has been disposed!");
+  }
+
+  AutoInitialize();
+
+  internal::Key key(typeid(std::shared_ptr<U>), name);
+
+#ifdef _CPPDI_DEBUG_MODE_
+  internal::CycleCheckGuard cycleCheckGuard(&cycle_verifier_, key);
+#endif
+  auto ptr_provider = GetPtrProvider(key);
+
+  if (ptr_provider) {
+    return std::static_pointer_cast<U>(ptr_provider->Get());
+  }
+
+  auto any_provider = GetAnyProvider(key);
+
+  if (!any_provider) {
+    throw InjectionError(std::string("No binding for " + key.GetFullName()));
+  }
+
+  return any_provider->Get().as<std::shared_ptr<U>>();
 }
 
 inline void Injector::Dispose() {
@@ -82,7 +143,8 @@ inline void Injector::Dispose() {
 
     // clearing collections, to cut cyclic dependency between Injector and
     // various Provider's
-    provider_map_.clear();
+    shared_any_provider_map_.clear();
+    shared_ptr_provider_map_.clear();
   }
 }
 

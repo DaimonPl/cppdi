@@ -9,32 +9,29 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CPPDI_INTERNAL_PRODUCING_PROVIDER_H_
-#define CPPDI_INTERNAL_PRODUCING_PROVIDER_H_
+#ifndef CPPDI_INTERNAL_PTR_INSTANCE_PROVIDER_H_
+#define CPPDI_INTERNAL_PTR_INSTANCE_PROVIDER_H_
 
 #include <memory>
-
 #include "cppdi/provider.h"
 
 namespace cppdi {
-
-class Injector;
-
 namespace internal {
 
-template<typename T, typename... Args>
-class ProducingProvider : public Provider<std::shared_ptr<void>> {
+class PtrInstanceProvider : public Provider<std::shared_ptr<void>> {
  public:
-  std::shared_ptr<void> Get() override;
+  explicit PtrInstanceProvider(const std::shared_ptr<void> &instance)
+      : instance_(instance) {
+  }
 
+  std::shared_ptr<void> Get() override {
+    return instance_;
+  }
  private:
-  void Initialize(const std::shared_ptr<cppdi::Injector> &injector) override;
-
   std::shared_ptr<void> instance_;
-  std::shared_ptr<cppdi::Injector> injector_;
 };
 
 }  // namespace internal
 }  // namespace cppdi
 
-#endif  // CPPDI_INTERNAL_PRODUCING_PROVIDER_H_
+#endif  // CPPDI_INTERNAL_PTR_INSTANCE_PROVIDER_H_
