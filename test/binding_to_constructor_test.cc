@@ -59,3 +59,33 @@ TEST(binding_to_constructor, with_type_argument) {
   EXPECT_EQ(injector->GetInstance<shared_ptr<TypeDependency>>(), injector->GetInstance<shared_ptr<Provider<shared_ptr<TypeDependency>>>>()->Get());
   EXPECT_EQ(injector->GetInstance<shared_ptr<NoDependency>>(), injector->GetInstance<shared_ptr<TypeDependency>>()->x_);
 }
+
+TEST(binding_to_constructor, with_const_ref_type_argument) {
+  cppdi::InjectorFactory factory;
+
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+    binder->BindConstructor<NoDependency>();
+    binder->BindConstructor<ConstRefTypeDependency, shared_ptr<NoDependency>>();
+  });
+  DisposeGuard guard(injector);
+
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<ConstRefTypeDependency>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<ConstRefTypeDependency>>(), injector->GetInstance<shared_ptr<ConstRefTypeDependency>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<ConstRefTypeDependency>>(), injector->GetInstance<shared_ptr<Provider<shared_ptr<ConstRefTypeDependency>>>>()->Get());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<NoDependency>>(), injector->GetInstance<shared_ptr<ConstRefTypeDependency>>()->x_);
+}
+
+TEST(binding_to_constructor, with_const_ref_type_argument2) {
+  cppdi::InjectorFactory factory;
+
+  shared_ptr<Injector> injector = factory.Create([](Binder *binder){
+    binder->BindConstructor<NoDependency>();
+    binder->BindConstructor<ConstRefTypeDependency, const shared_ptr<NoDependency>&>();
+  });
+  DisposeGuard guard(injector);
+
+  EXPECT_FALSE(!injector->GetInstance<shared_ptr<ConstRefTypeDependency>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<ConstRefTypeDependency>>(), injector->GetInstance<shared_ptr<ConstRefTypeDependency>>());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<ConstRefTypeDependency>>(), injector->GetInstance<shared_ptr<Provider<shared_ptr<ConstRefTypeDependency>>>>()->Get());
+  EXPECT_EQ(injector->GetInstance<shared_ptr<NoDependency>>(), injector->GetInstance<shared_ptr<ConstRefTypeDependency>>()->x_);
+}

@@ -13,6 +13,7 @@
 #define CPPDI_INTERNAL_PRODUCING_PROVIDER_IMPL_H_
 
 #include <memory>
+#include <type_traits>
 
 #include "cppdi/provider.h"
 #include "cppdi/internal/producing_provider.h"
@@ -20,10 +21,11 @@
 namespace cppdi {
 namespace internal {
 
-template<typename T, typename... Args>
+template<typename T, typename ... Args>
 std::shared_ptr<void> ProducingProvider<T, Args...>::Get() {
   if (!instance_) {
-    instance_ = std::make_shared<T>(injector_->GetInstance<Args>()...);
+    instance_ = std::make_shared<T>(
+        injector_->GetInstance<typename std::decay<Args>::type>()...);
 
     // instance was created, pointer to injector can be removed
     injector_.reset();

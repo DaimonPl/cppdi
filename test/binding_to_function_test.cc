@@ -41,3 +41,29 @@ TEST(binding_to_function, with_argument) {
   EXPECT_EQ(long_function_with_int_arg(int_function()), injector->GetInstance<long>());
   EXPECT_EQ(long_function_with_int_arg(int_function()), injector->GetInstance<shared_ptr<Provider<long>>>()->Get());
 }
+
+TEST(binding_to_function, with_const_ref_argument) {
+  cppdi::InjectorFactory factory;
+
+  shared_ptr<Injector> injector = factory.Create([=](Binder *binder) {
+    binder->BindConstructor<NoDependency>();
+    binder->BindFunction<long>(std::function<long(std::shared_ptr<NoDependency>)>(long_function_with_const_ref_arg));
+  });
+  DisposeGuard guard(injector);
+
+  EXPECT_EQ(30, injector->GetInstance<long>());
+  EXPECT_EQ(30, injector->GetInstance<shared_ptr<Provider<long>>>()->Get());
+}
+
+TEST(binding_to_function, with_const_ref_argument2) {
+  cppdi::InjectorFactory factory;
+
+  shared_ptr<Injector> injector = factory.Create([=](Binder *binder) {
+    binder->BindConstructor<NoDependency>();
+    binder->BindFunction<long>(std::function<long(const std::shared_ptr<NoDependency> &)>(long_function_with_const_ref_arg));
+  });
+  DisposeGuard guard(injector);
+
+  EXPECT_EQ(30, injector->GetInstance<long>());
+  EXPECT_EQ(30, injector->GetInstance<shared_ptr<Provider<long>>>()->Get());
+}

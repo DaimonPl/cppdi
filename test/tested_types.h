@@ -48,6 +48,14 @@ struct TypeDependency {
   std::shared_ptr<NoDependency> x_;
 };
 
+struct ConstRefTypeDependency {
+  ConstRefTypeDependency(const std::shared_ptr<NoDependency> &x) {
+    x_ = x;
+  }
+
+  std::shared_ptr<NoDependency> x_;
+};
+
 struct Interface {
   virtual ~Interface() {}
   virtual void interface_method() = 0;
@@ -125,6 +133,11 @@ inline int int_function() {
 
 inline long long_function_with_int_arg(int a) {
   return a + 22;
+}
+
+inline long long_function_with_const_ref_arg(
+    const std::shared_ptr<NoDependency> &val) {
+  return 30;
 }
 
 struct CycleIntf1 {

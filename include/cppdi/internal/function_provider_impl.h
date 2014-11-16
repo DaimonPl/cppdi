@@ -12,6 +12,8 @@
 #ifndef CPPDI_INTERNAL_FUNCTION_PROVIDER_IMPL_H_
 #define CPPDI_INTERNAL_FUNCTION_PROVIDER_IMPL_H_
 
+#include <type_traits>
+
 #include "cppdi/internal/function_provider.h"
 
 namespace cppdi {
@@ -25,7 +27,8 @@ FunctionProvider<T, Args...>::FunctionProvider(
 
 template<typename T, typename ...Args>
 SharedAny FunctionProvider<T, Args...>::Get() {
-  return SharedAny(function_(injector_->GetInstance<Args>()...));
+  return SharedAny(
+      function_(injector_->GetInstance<typename std::decay<Args>::type>()...));
 }
 
 template<typename T, typename ...Args>
