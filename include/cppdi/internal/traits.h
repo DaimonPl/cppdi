@@ -35,6 +35,22 @@ template <typename T>
 using is_shared_ptr =
     typename is_shared_ptr_impl<typename std::decay<T>::type>::type;
 
+/**
+ * Trait which checks if type is constant or reference
+ */
+template <typename T>
+struct is_cr {
+  constexpr static bool value = !std::is_same<T, typename std::decay<T>::type>::value;
+};
+
+/**
+ * Trait which checks if type is constant, reference or pointer
+ */
+template <typename T>
+struct is_crp {
+  constexpr static bool value = is_cr<T>::value || std::is_pointer<T>::value;
+};
+
 }  // namespace internal
 }  // namespace cppdi
 

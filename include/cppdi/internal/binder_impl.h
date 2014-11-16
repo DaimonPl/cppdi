@@ -31,6 +31,9 @@ namespace cppdi {
 
 template<typename T, typename ... Args>
 void Binder::BindConstructor(const std::string &name) {
+  static_assert(!internal::is_crp<T>::value, "BindConstructor<T, Args...>()"
+      " - T must not be constant, reference nor pointer");
+
   internal::Key key(typeid(std::shared_ptr<T>), name);
 
   internal::VoidPtrProviderPtr provider =
@@ -56,6 +59,10 @@ void Binder::BindTypes(const std::string &f_name, const std::string &t_name) {
                 "BindTypes<F, T>() - T must be a descendant of F");
   static_assert(!std::is_same<F, T>::value,
                 "BindTypes<F, T>() - T cannot be same as F");
+  static_assert(!internal::is_crp<T>::value, "BindTypes<F, T>()"
+        " - T must not be constant, reference nor pointer");
+  static_assert(!internal::is_crp<F>::value, "BindTypes<F, T>()"
+          " - F must not be constant, reference nor pointer");
 
   internal::Key source_key(typeid(std::shared_ptr<F>), f_name);
 
@@ -73,6 +80,9 @@ void Binder::BindInstance(const T &instance) {
 
 template<typename T>
 void Binder::BindInstance(const T &instance, const std::string &name) {
+  static_assert(!internal::is_cr<T>::value,
+                "BindInstance<T>() - T must not be constant nor reference");
+
   internal::Key key(typeid(T), name);
 
   internal::SharedAnyProviderPtr provider =
@@ -89,8 +99,12 @@ void Binder::BindProvider() {
 
 template<typename T, typename P>
 void Binder::BindProvider(const std::string &name) {
+  static_assert(!internal::is_crp<T>::value, "BindProvider<T, P>()"
+          " - T must not be constant, reference nor pointer");
   static_assert(std::is_base_of<Provider<T>, P>::value,
                 "BindProvider<T, P>() - P must implement Provider<T>");
+  static_assert(std::is_default_constructible<P>::value,
+                "BindProvider<T, P>() - P must be default constructible");
 
   internal::Key key(typeid(T), name);
   std::shared_ptr<Provider<T>> provider = std::make_shared<P>();
@@ -109,6 +123,9 @@ void Binder::BindFunction(const std::function<T(Args...)> &producing_func) {
 template<typename T, typename ...Args>
 void Binder::BindFunction(const std::function<T(Args...)> &producing_func,
                           const std::string &name) {
+  static_assert(!internal::is_crp<T>::value, "BindFunction<T, Args...>()"
+            " - T must not be constant, reference nor pointer");
+
   internal::Key key(typeid(T), name);
 
   internal::SharedAnyProviderPtr provider =
