@@ -33,6 +33,11 @@ class Error : public std::exception {
   }
 
  protected:
+  /**
+   * Creates Error
+   *
+   * @param msg message describing reason of error
+   */
   explicit Error(const std::string &msg) : message(msg) {}
 
  private:
@@ -43,6 +48,11 @@ class Error : public std::exception {
  * Error during injection phase.
  */
 struct InjectionError : public Error {
+  /**
+   * Creates InjectionError
+   *
+   * @param msg message describing reason of error
+   */
   explicit InjectionError(const std::string &msg) : Error(msg) {}
 };
 
@@ -54,6 +64,11 @@ struct InjectionError : public Error {
  * If debug mode is not enabled, injection cycle will lead to stack overflow.
  */
 struct InjectionCycleError : public InjectionError {
+  /**
+   * Creates InjectionCycleError
+   *
+   * @param msg message describing reason of error
+   */
   explicit InjectionCycleError(const std::string &msg) : InjectionError(msg) {}
 };
 
@@ -61,6 +76,11 @@ struct InjectionCycleError : public InjectionError {
  * Error during binding phase.
  */
 struct BindingError : public Error {
+  /**
+   * Creates BindingError
+   *
+   * @param msg message describing reason of error
+   */
   explicit BindingError(const std::string &msg) : Error(msg) {}
 };
 

@@ -120,6 +120,7 @@ auto Injector::GetNamedInstance(const std::string &name)
 #ifdef _CPPDI_DEBUG_MODE_
   internal::CycleCheckGuard cycleCheckGuard(&cycle_verifier_, key);
 #endif
+
   auto ptr_provider = GetPtrProvider(key);
 
   if (ptr_provider) {

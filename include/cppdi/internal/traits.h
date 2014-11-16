@@ -15,13 +15,13 @@
 #include <memory>
 #include <type_traits>
 
+namespace cppdi {
+namespace internal {
+
 /**
  * Code is based on answer for SO question from
  * http://stackoverflow.com/questions/26915718
  */
-
-namespace cppdi {
-namespace internal {
 
 template <typename T>
 struct is_shared_ptr_impl : std::false_type {};

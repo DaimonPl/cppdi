@@ -21,6 +21,12 @@ namespace cppdi {
  */
 class DisposeGuard {
  public:
+  /**
+   * Create DisposeGuard
+   *
+   * @param injector injector pointer which should be disposed when stack
+   *                 unwinds
+   */
   explicit DisposeGuard(const std::shared_ptr<Injector> &injector)
       : injector_(injector) {}
 
