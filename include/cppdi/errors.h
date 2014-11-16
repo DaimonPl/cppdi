@@ -49,7 +49,9 @@ struct InjectionError : public Error {
 /**
  * Error caused by cycle during injection.
  *
- * It's thrown only during debug mode (see InjectorFactory::InjectorFactory(bool)
+ * It's thrown only during debug mode (_CPPDI_DEBUG_MODE_ flag must be enabled)
+ *
+ * If debug mode is not enabled, injection cycle will lead to stack overflow.
  */
 struct InjectionCycleError : public InjectionError {
   explicit InjectionCycleError(const std::string &msg) : InjectionError(msg) {}

@@ -13,12 +13,11 @@
 #define CPPDI_CPPDI_H_
 
 /**
- * Single header file which includes entire public cppdi API
+ * Single header file which includes entire public cppdi API.
  *
- * User of cppdi should include only this file
- */
-
-/**
+ * User of cppdi should include only this file.
+ *
+ *
  * Compile time flags:
  * _CPPDI_DEBUG_MODE_ - enables additional runtime checks (including automatic
  *                      cycle detection)
