@@ -15,6 +15,7 @@
 #include <memory>
 #include <string>
 #include <typeinfo>
+#include <type_traits>
 #include <utility>
 
 #include "cppdi/injector.h"
@@ -78,6 +79,9 @@ T Injector::GetInstance() {
 
 template <typename T>
 T Injector::GetInstance(const std::string &name) {
+  static_assert(!internal::is_cr<T>::value,
+                "GetInstance<T>() - T must not be constant nor reference");
+
   return GetNamedInstance<T>(name);
 }
 
